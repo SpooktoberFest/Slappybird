@@ -1,18 +1,16 @@
 
 // #include "menu.hpp"
-#include "world_1.hpp"
+#include "game.hpp"
 
 int main(void) {
-    INITIALIZE
+    {
+        Scene scene;
 
-    World world = spawn_world(MAX_PIPES);
+        while (!WindowShouldClose()) {
+            scene.simulate();
+            scene.render();
+        }
 
-    while (!WindowShouldClose()) {
-        if (!world.gameOver) simulate(world);
-        else game_over(world);
-        render(world);
     }
-
-    SHUTDOWN
     return 0;
 }
