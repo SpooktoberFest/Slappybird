@@ -20,4 +20,8 @@ Scene::Scene() {
         _pipes[i].passed = false;
     }
 
+    _buttons.push_back({
+        {600, 100, 90, 40}, "Button 1"
+    });
+
 };

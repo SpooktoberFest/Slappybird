@@ -33,6 +33,7 @@ private:
 
     void handle_collision();
     void handle_input();
+    void handle_action(const Action& action);
     void set_background(OptColor color1, OptColor color2);
     void update_resolution(const bool override=false);
 
@@ -42,11 +43,13 @@ private:
     GameState _gamestate = GameState::INIT;
 
     // Window Properties
-    Vector2 resoulution = {800, 450};
+    Vector2 _resoulution = {800, 450};
     // float _px_per_m = 20;
 
     // Visuals
-    Shader _gradientShader;
+    Shader _gradient_shader;
+
+    ControlScheme _controls;
 };
 
 

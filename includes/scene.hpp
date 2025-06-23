@@ -22,6 +22,7 @@ public:
     Player player;
     std::vector<Pipe> _pipes;
     std::vector<Button> _buttons;
+    short _selected;
 
     // Level Parameters
     float _pipe_width = 60.0f;
@@ -29,7 +30,7 @@ public:
     float _gravity = 0.5f;
     float _jump_strength = -8.0f;
     float _pipe_speed = 3.0f;
-    Vector2 _camera_velocity = {NANF, 0.0f}; // Where NANF means follow player
+    Vector2 _camera_velocity = {2.0f, 0.0f}; // Where NANF means follow player
 
     // Level State
     unsigned short _score = 0;

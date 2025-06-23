@@ -3,16 +3,22 @@
 # To do:
 
 Now:
-- Buttons
 - Platforms
+- Level Glossary
+- Basic Attack
+
 
 ----
 
 
 Soon:
-- Menu
+- Pause Menu
+- Level Select
 - Other Levels
 - Basic Enemies
+- Attack Speed
+- Boost Panels
+- Toggleable Blocks
 
 ----
 
