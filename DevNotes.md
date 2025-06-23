@@ -3,9 +3,8 @@
 # To do:
 
 Now:
-- Movement
-- Dimensioning
 - Buttons
+- Platforms
 
 ----
 
@@ -14,8 +13,6 @@ Soon:
 - Menu
 - Other Levels
 - Basic Enemies
-- Platforms
-- Movement
 
 ----
 

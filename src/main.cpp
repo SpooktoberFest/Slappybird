@@ -4,11 +4,15 @@
 
 int main(void) {
     {
-        Scene scene;
+        srand(time(0));
+
+        Scene scene_1;
+        Game game;
+        game.load_scene(&scene_1);
 
         while (!WindowShouldClose()) {
-            scene.simulate();
-            scene.render();
+            game.simulate();
+            game.render();
         }
 
     }
