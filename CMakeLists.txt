@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 3.10)
 project(SlappyBird)
-set(EXECUTABLE_NAME "${PROJECT_NAME}.exe")
+
+if(WIN32)
+    set(EXECUTABLE_NAME "SuperFlappyKendokaPerson.exe")
+else()
+    set(EXECUTABLE_NAME "SuperFlappyKendokaPerson")
+endif()
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -17,7 +22,10 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin)
 add_executable(${EXECUTABLE_NAME} ${SOURCES})
 
 # Add include path for header files
-target_include_directories(${EXECUTABLE_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/includes)
+target_include_directories(${EXECUTABLE_NAME} PRIVATE
+    ${CMAKE_SOURCE_DIR}/includes
+    ${CMAKE_SOURCE_DIR}/third_party
+)
 
 # Link raylib (and dependencies if needed)
 target_link_libraries(${EXECUTABLE_NAME} raylib)
@@ -26,3 +34,4 @@ target_link_libraries(${EXECUTABLE_NAME} raylib)
 if(UNIX AND NOT APPLE)
     target_link_libraries(${EXECUTABLE_NAME} m pthread dl)
 endif()
+
