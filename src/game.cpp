@@ -8,6 +8,7 @@ Game::Game() {
     InitWindow(_resoulution.x, _resoulution.y, "Super Flappy Kendoka Person!");
     // InitAudioDevice();
     SetTargetFPS(60);
+    SetExitKey(KEY_NULL);
 
     _gradient_shader = LoadShader(0, "resources/shaders/gradient.fs");
     update_resolution(true);
@@ -39,6 +40,11 @@ void Game::render() {
     for (const auto& pipe : _scene._pipes) {
         DrawRectangleRec(pipe.topRect - _scene._camera_position, GREEN);
         DrawRectangleRec(pipe.bottomRect - _scene._camera_position, GREEN);
+    }
+
+    // Draw Platforms
+    for (const auto& platform : _scene._platforms) {
+        DrawRectangleRec(platform.rect - _scene._camera_position, BROWN);
     }
 
     // Draw Buttons
@@ -90,6 +96,11 @@ void Game::simulate() {
 
     handle_input();
 
+    if (_gamestate > GameState::PAUSED) return;
+
+
+    if (_gamestate > GameState::GAMEOVER) return;
+
     // Update Bird
     {
         Player& p = _scene.player;
@@ -98,7 +109,8 @@ void Game::simulate() {
         p.hitbox.y += p.velocity.y;
     }
 
-    if (_gamestate != GameState::RUNNING) return;
+
+    if (_gamestate > GameState::RUNNING) return;
     
     // Update Camera
     {
@@ -121,14 +133,40 @@ void Game::load_scene(const Scene* const scene) {
 }
 
 void Game::handle_input() {
+    /*
+    for (int keycode = GetKeyPressed() ; keycode != 0 ; keycode = GetKeyPressed()) {
+        switch (keycode)
+        {
+        case _controls.jump:
+            break;
+        default:
+            break;
+        }
+    }
+    */
 
     if (IsKeyPressed(_controls.reset)) {
         _scene = *_scene_template;
         _gamestate = GameState::RUNNING;
     }
-    // if (IsKeyPressed(_controls.pause)) {
-    //     _gamestate =  (_gamestate == GameState::PAUSED) ? GameState::RUNNING : GameState::PAUSED;
-    // }
+    if (IsKeyPressed(_controls.pause)) {
+        switch (_gamestate) {
+        case GameState::PAUSED:
+            _gamestate = GameState::RUNNING;
+            break;
+        case GameState::RUNNING:
+            _gamestate = GameState::PAUSED;
+            break;
+        case GameState::GAMEOVER:
+            _gamestate = GameState::PAUSED_GAMEOVER;
+            break;
+        case GameState::PAUSED_GAMEOVER:
+            _gamestate = GameState::GAMEOVER;
+            break;
+        default:
+            break;
+        }
+    }
 
     // Mouse & Buttons
     if (_scene._buttons.size() > 0) {
@@ -147,7 +185,7 @@ void Game::handle_input() {
         }
     }
 
-    if (_gamestate != GameState::RUNNING) return;
+    if (_gamestate > GameState::RUNNING) return;
 
     // Move player
     if (IsKeyPressed(_controls.jump)) {
@@ -176,6 +214,36 @@ void Game::handle_collision() {
     if (!CheckCollisionRecs(p.hitbox, screen_border)) {
         _gamestate = GameState::GAMEOVER;
     }
+
+    // Check player-platforms collisions
+    for (const auto& pf : _scene._platforms) {
+        if (CheckCollisionRecs(p.hitbox, pf.rect)) {
+            float arr[4] = {
+                pf.rect.x + pf.rect.width - p.hitbox.x,
+                p.hitbox.x + p.hitbox.width - pf.rect.x,
+                pf.rect.y + pf.rect.height - p.hitbox.y,
+                p.hitbox.y + p.hitbox.height - pf.rect.y,
+            };
+
+            // Optional: ensure all values are >= 0
+            for (float& a : arr) a = std::max(0.0f, a);
+
+            int index = 0;
+            for (int i = 1; i < 4; ++i) {
+                if (arr[i] < arr[index]) {
+                    index = i;
+                }
+            }
+
+            switch (index) {
+                case 0: p.hitbox.x += arr[index]; p.velocity.x = 0; break;
+                case 1: p.hitbox.x -= arr[index]; p.velocity.x = 0; break;
+                case 2: p.hitbox.y += arr[index]; p.velocity.y = 0; break;
+                case 3: p.hitbox.y -= arr[index]; p.velocity.y = 0; break;
+            }
+        }
+    }
+
 
     // Update pipes
     for (int i = 0; i < _scene._pipes.size(); i++) {
@@ -206,7 +274,6 @@ void Game::handle_collision() {
     }
 }
 
-
 void Game::handle_action(const Action& action) {
     
     // Load World Action
@@ -228,7 +295,7 @@ void Game::handle_action(const Action& action) {
     switch (action)
     {
     default:
-        LOG_ERROR(src, "Unknown Action: " + std::to_string(action));
+        LOG_WARN(src, "Unknown Action: " + std::to_string(action));
         break;
     }
 

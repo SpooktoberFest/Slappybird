@@ -15,8 +15,8 @@
 class Game {
     using OptColor = std::optional<std::array<float, 3>>;
 
-    enum class GameState : u_int8_t {
-        INIT, RUNNING, PAUSED, GAMEOVER, QUIT
+    enum GameState : u_int8_t {
+        RUNNING, GAMEOVER, PAUSED, PAUSED_GAMEOVER, INIT, QUIT
     };
 
 public:

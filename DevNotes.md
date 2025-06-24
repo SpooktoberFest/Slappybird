@@ -3,15 +3,15 @@
 # To do:
 
 Now:
-- Platforms
 - Level Glossary
-- Basic Attack
 
 
 ----
 
 
 Soon:
+- Spawners
+- Basic Attack
 - Pause Menu
 - Level Select
 - Other Levels

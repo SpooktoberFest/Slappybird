@@ -20,6 +20,10 @@ struct Pipe {
     bool passed;
 };
 
+struct Platform {
+    Rectangle rect;
+};
+
 
 enum Action : int16_t {
     // Load world
