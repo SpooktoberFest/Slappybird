@@ -2,16 +2,17 @@
 #define SUPERFLAPPY_SCENE_HPP
 
 #include <stdlib.h>
-#include <time.h>
-#include <cmath>
-
+#include <limits>
 #include <vector>
 #include <optional>
 #include <array>
 
+#include <cereal/types/vector.hpp>
+#include <cereal/types/memory.hpp>
+
 #include "entities.hpp"
 
-#define NANF std::nanf("")
+#define QNAN std::numeric_limits<float>::quiet_NaN()
 
 class Scene {
 public:
@@ -31,12 +32,21 @@ public:
     float _gravity = 0.5f;
     float _jump_strength = -8.0f;
     float _pipe_speed = 3.0f;
-    Vector2 _camera_velocity = {NANF, NANF}; // Where NANF means follow player
+    Vec2 _camera_velocity = {QNAN, QNAN}; // Where QNAN means follow player
 
     // Level State
     unsigned short _score = 0;
-    Vector2 _camera_position;
+    Vec2 _camera_position;
+
+    // Serialization function for cereal
+    template <class Archive>
+    void serialize(Archive& ar) {
+        ar(_pipes, _buttons, _platforms, _selected,
+           _pipe_width, _gap_height, _gravity, _jump_strength, _pipe_speed,
+           _camera_velocity, _score, _camera_position);
+    }
 };
+
 
 
 #endif // SUPERFLAPPY_SCENE_HPP

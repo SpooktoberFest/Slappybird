@@ -3,17 +3,16 @@
 # To do:
 
 Now:
-- Level Glossary
+- Spawners
+- Basic Attack
+- Pause Menu
+- Level Select
 
 
 ----
 
 
 Soon:
-- Spawners
-- Basic Attack
-- Pause Menu
-- Level Select
 - Other Levels
 - Basic Enemies
 - Attack Speed

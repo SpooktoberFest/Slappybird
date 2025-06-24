@@ -1,15 +1,12 @@
 #include "game.hpp"
 #include "debug.hpp"
+#include <fstream>
 
 const static auto src = "Scene";
 
 Scene::Scene() {
     const int number_of_pipes = 5;
     float screen_height_px = 450;
-
-    player.hitbox;
-    player.velocity;
-    player.move_speed = 5.0f;
 
     _pipes.resize(number_of_pipes);
     for (std::size_t i = 0; i < number_of_pipes; i++) {
@@ -25,7 +22,7 @@ Scene::Scene() {
     });
 
     _buttons.push_back({
-        {600, 100, 90, 40}, "Button 1"
+        {600, 100, 90, 40}, "Button 1", Action::NORMAL_ACTION
     });
-
 };
+

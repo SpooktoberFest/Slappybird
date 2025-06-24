@@ -1,5 +1,5 @@
 
-// #include "menu.hpp"
+#include <ctime>
 #include "game.hpp"
 
 int main(void) {
@@ -14,7 +14,6 @@ int main(void) {
             game.simulate();
             game.render();
         }
-
     }
     return 0;
 }

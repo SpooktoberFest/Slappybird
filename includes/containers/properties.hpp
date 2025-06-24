@@ -1,29 +1,33 @@
-#ifndef SUPERFLAPPY_ENTITIES_HPP
-#define SUPERFLAPPY_ENTITIES_HPP
+#ifndef SUPERFLAPPY_PROPERTIES_HPP
+#define SUPERFLAPPY_PROPERTIES_HPP
+
+#include <limits.h>
+#include <stdint.h>
 
 #include "raylib.h"
-#include <vector>
-#include <string>
-#include <limits.h>
 
-struct Player {
-    Rectangle hitbox = {100, 450/2, 34, 24};
-    Vector2 velocity = {0.0f, 0.0f};
-    float move_speed;
-};
+#include <cereal/types/vector.hpp>
+#include <cereal/types/memory.hpp>
 
-struct Pipe {
+struct Vec2 {
     float x;
-    float gapY;
-    Rectangle topRect;
-    Rectangle bottomRect;
-    bool passed;
+    float y;
+
+    operator Vector2() const { return {x, y}; };
+    template <class Archive>
+    void serialize(Archive& ar) { ar(x, y); }
 };
 
-struct Platform {
-    Rectangle rect;
-};
+struct Rect {
+    float x;
+    float y;
+    float w;
+    float h;
 
+    operator Rectangle() const { return {x, y, w, h}; };
+    template <class Archive>
+    void serialize(Archive& ar) { ar(x, y, w, h); }
+};
 
 enum Action : int16_t {
     // Load world
@@ -44,10 +48,8 @@ enum Action : int16_t {
     DELETE_SAVE,
 };
 
-struct Button {
-    Rectangle rect;
-    std::string text;
-    Action action;
+struct Profile {
+    
 };
 
 
@@ -81,4 +83,4 @@ struct ControlScheme {
 
 
 
-#endif // SUPERFLAPPY_ENTITIES_HPP
+#endif // SUPERFLAPPY_PROPERTIES_HPP

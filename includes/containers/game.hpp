@@ -1,15 +1,13 @@
 #ifndef SUPERFLAPPY_GAME_HPP
 #define SUPERFLAPPY_GAME_HPP
 
-#include <stdlib.h>
-#include <time.h>
-
 #include <vector>
 #include <optional>
 #include <array>
 
 #include "entities.hpp"
 #include "scene.hpp"
+#include "serializer.hpp"
 
 
 class Game {
@@ -29,6 +27,9 @@ public:
     void render();
     void load_scene(const Scene* const scene);
 
+
+    Serializer _serializer;
+
 private:
 
     void handle_collision();
@@ -46,11 +47,13 @@ private:
     Vector2 _resoulution = {800, 450};
     // float _px_per_m = 20;
 
-    // Visuals
+    // Misc
     Shader _gradient_shader;
-
     ControlScheme _controls;
+
 };
+
+
 
 
 #endif // SUPERFLAPPY_GAME_HPP
