@@ -45,7 +45,6 @@ private:
 
     // Window Properties
     Vector2 _resoulution = {800, 450};
-    // float _px_per_m = 20;
 
     // Misc
     Shader _gradient_shader;

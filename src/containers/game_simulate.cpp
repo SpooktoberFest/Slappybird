@@ -18,10 +18,10 @@ void Game::simulate() {
 
     // Update Bird
     {
-        Player& p = _scene.player;
-        p.velocity.y += _scene._gravity;
-        p.hitbox.x += p.velocity.x;
-        p.hitbox.y += p.velocity.y;
+        Chararacter& p = _scene._player;
+        p.vel.y += _scene._gravity;
+        p.pos.x += p.vel.x;
+        p.pos.y += p.vel.y;
     }
 
 
@@ -32,10 +32,10 @@ void Game::simulate() {
         Vec2& cam_vel = _scene._camera_velocity;
         Vec2& cam_pos = _scene._camera_position;
         if (std::isnan(cam_vel.x))
-            cam_pos.x = _scene.player.hitbox.x - (_resoulution.x / 2);
+            cam_pos.x = _scene._player.pos.x - (_resoulution.x / 2);
         else cam_pos.x += cam_vel.x;
         if (std::isnan(cam_vel.y))
-            cam_pos.y = _scene.player.hitbox.y - (_resoulution.y / 2);
+            cam_pos.y = _scene._player.pos.y - (_resoulution.y / 2);
         else cam_pos.y += cam_vel.y;
     }
 
@@ -80,6 +80,19 @@ void Game::handle_input() {
 
     // Mouse & Buttons
     if (_scene._buttons.size() > 0) {
+        // Move selection
+        if (IsKeyPressed(_controls.nav_left)) {
+            _scene._selected += 8;
+        }
+        if (IsKeyPressed(_controls.nav_right)) {
+            _scene._selected -= 8;
+        }
+        if (IsKeyPressed(_controls.nav_up)) {
+            --_scene._selected;
+        }
+        if (IsKeyPressed(_controls.nav_down)) {
+            ++_scene._selected;
+        }
         _scene._selected %= _scene._buttons.size();
         Vector2 mouse_pos = GetMousePosition();
         for (short i = 0; i < _scene._buttons.size(); ++i) {
@@ -100,40 +113,41 @@ void Game::handle_input() {
 
     // Move player
     if (IsKeyPressed(_controls.jump)) {
-        _scene.player.velocity.y = _scene._jump_strength;
+        _scene._player.vel.y = _scene._jump_strength;
     }
     if (IsKeyDown(_controls.move_left)) {
-        _scene.player.hitbox.x -= _scene.player.move_speed;
+        _scene._player.pos.x -= _scene._move_speed;
     }
     if (IsKeyDown(_controls.move_right)) {
-        _scene.player.hitbox.x += _scene.player.move_speed;
+        _scene._player.pos.x += _scene._move_speed;
     }
     if (IsKeyDown(_controls.move_up)) {
-        _scene.player.hitbox.y -= _scene.player.move_speed;
+        _scene._player.pos.y -= _scene._move_speed;
     }
     if (IsKeyDown(_controls.move_down)) {
-        _scene.player.hitbox.y += _scene.player.move_speed;
+        _scene._player.pos.y += _scene._move_speed;
     }
 }
 
 void Game::handle_collision() {
-    Player& p = _scene.player;
-    Vec2& cam_pos{_scene._camera_position};
-    const Rectangle screen_border = {cam_pos.x, cam_pos.y, _resoulution.x, _resoulution.y};
+    Chararacter& p1 = _scene._player;
+    const Rect p1box = p1.box(1_b, 2_b);
+    Vec2& cam{_scene._camera_position};
+    const Rectangle screen_border = {cam.x, cam.y, _resoulution.x, _resoulution.y};
 
     // Check player-border collisions
-    if (!CheckCollisionRecs(p.hitbox, screen_border)) {
+    if (!CheckCollisionRecs(p1box, screen_border)) {
         _gamestate = GameState::GAMEOVER;
     }
 
     // Check player-platforms collisions
     for (const auto& pf : _scene._platforms) {
-        if (CheckCollisionRecs(p.hitbox, pf.rect)) {
+        if (CheckCollisionRecs(p1box, pf.rect)) {
             float arr[4] = {
-                pf.rect.x + pf.rect.w - p.hitbox.x,
-                p.hitbox.x + p.hitbox.w - pf.rect.x,
-                pf.rect.y + pf.rect.h - p.hitbox.y,
-                p.hitbox.y + p.hitbox.h - pf.rect.y,
+                pf.rect.x + pf.rect.w - p1box.x,
+                p1box.x + p1box.w - pf.rect.x,
+                pf.rect.y + pf.rect.h - p1.pos.y,
+                p1box.y + p1box.h - pf.rect.y,
             };
 
             int index = 0;
@@ -144,10 +158,10 @@ void Game::handle_collision() {
             }
 
             switch (index) {
-                case 0: p.hitbox.x += arr[index]; p.velocity.x = 0; break;
-                case 1: p.hitbox.x -= arr[index]; p.velocity.x = 0; break;
-                case 2: p.hitbox.y += arr[index]; p.velocity.y = 0; break;
-                case 3: p.hitbox.y -= arr[index]; p.velocity.y = 0; break;
+                case 0: p1.pos.x += arr[index]; p1.vel.x = 0; break;
+                case 1: p1.pos.x -= arr[index]; p1.vel.x = 0; break;
+                case 2: p1.pos.y += arr[index]; p1.vel.y = 0; break;
+                case 3: p1.pos.y -= arr[index]; p1.vel.y = 0; break;
             }
         }
     }
@@ -157,24 +171,21 @@ void Game::handle_collision() {
         Pipe& pipe = _scene._pipes[i];
 
         // Reset when the left of screen
-        if (pipe.x < cam_pos.x - _scene._pipe_width) {
-            pipe.x = _resoulution.x + 250 + cam_pos.x;
-            pipe.gapY = 100 + rand() % 200;
+        if (pipe.pos.x < cam.x - _scene._pipe_width) {
+            pipe.pos.x = _resoulution.x + 250 + cam.x;
+            pipe.pos.y = 100 + rand() % 200;
             pipe.passed = false;
         }
 
-        // Update data
-        pipe.topRect = (Rect){pipe.x, 0, _scene._pipe_width, pipe.gapY};
-        pipe.bottomRect = (Rect){pipe.x, pipe.gapY + _scene._gap_height, _scene._pipe_width, _resoulution.y};
-
         // Check player-pipe collisions
-        if (CheckCollisionRecs(p.hitbox, pipe.topRect) ||
-            CheckCollisionRecs(p.hitbox, pipe.bottomRect)) {
+        auto hboxes = pipe.box(_scene._pipe_width, _scene._gap_height);
+        if (CheckCollisionRecs(p1box, std::move(hboxes[0])) ||
+            CheckCollisionRecs(p1box, std::move(hboxes[1]))) {
             _gamestate = GameState::GAMEOVER;
         }
 
         // Scoring
-        if (!pipe.passed && pipe.x + _scene._pipe_width < p.hitbox.x) {
+        if (!pipe.passed && pipe.pos.x + _scene._pipe_width < p1box.x) {
             pipe.passed = true;
             _scene._score++;
         }

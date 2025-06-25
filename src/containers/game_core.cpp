@@ -29,35 +29,39 @@ Game::~Game() {
 
 void Game::render() {
     update_resolution();
-
     BeginDrawing();
 
+    // Background
     BeginShaderMode(_gradient_shader);
     DrawRectangle(0, 0, _resoulution.x, _resoulution.y, WHITE);
     EndShaderMode();
 
-    DrawText("Slappy Bird (Raylib)", 10, 10, 20, DARKGRAY);
-    DrawRectangleRec(_scene.player.hitbox - _scene._camera_position, WHITE);
-
-    // Draw Pipes
+    // Pipes
     for (const auto& pipe : _scene._pipes) {
-        DrawRectangleRec(pipe.topRect - _scene._camera_position, GREEN);
-        DrawRectangleRec(pipe.bottomRect - _scene._camera_position, GREEN);
+        auto hboxes = pipe.box(_scene._pipe_width, _scene._gap_height);
+        DrawRectangleRec(std::move(hboxes[0]) - _scene._camera_position, GREEN);
+        DrawRectangleRec(std::move(hboxes[1]) - _scene._camera_position, GREEN);
     }
 
-    // Draw Platforms
+    // Platforms
     for (const auto& platform : _scene._platforms) {
         DrawRectangleRec(platform.rect - _scene._camera_position, BROWN);
     }
 
-    // Draw Buttons
+    // Buttons
     for (const auto& button : _scene._buttons) {
         DrawRectangleRec(button.rect, WHITE);
         DrawText(button.text.c_str(), button.rect.x + 5, button.rect.y + 5, 20, DARKGRAY);
     }
+    if (_scene._selected < _scene._buttons.size())
+        DrawRectangleLinesEx(_scene._buttons[_scene._selected].rect, 5.0f, YELLOW);
 
+    // Player
+    DrawRectangleRec(_scene._player.box(1_b, 2_b) - _scene._camera_position, WHITE);
+
+    // Text
     DrawText(TextFormat("Score: %d", _scene._score), _resoulution.x - 150, 10, 20, BLUE);
-
+    DrawText("Slappy Bird (Raylib)", 10, 10, 20, DARKGRAY);
     if (_gamestate == GameState::QUIT) {
         DrawText("Game Over! Press R to Restart", _resoulution.x /2 - 160, _resoulution.y /2 - 10, 20, MAROON);
     }

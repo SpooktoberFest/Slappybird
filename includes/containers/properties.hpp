@@ -9,30 +9,37 @@
 #include <cereal/types/vector.hpp>
 #include <cereal/types/memory.hpp>
 
+// Literal for block unit
+constexpr float operator"" _b(unsigned long long value) {
+    return static_cast<float>(value) * 32.0f;
+}
+
+
 struct Vec2 {
     float x;
     float y;
 
-    operator Vector2() const { return {x, y}; };
     template <class Archive>
     void serialize(Archive& ar) { ar(x, y); }
+    operator Vector2() const { return {x, y}; };
 };
 
 struct Rect {
     float x;
     float y;
-    float w;
-    float h;
+    float w = 1_b;
+    float h = 1_b;
 
-    operator Rectangle() const { return {x, y, w, h}; };
     template <class Archive>
     void serialize(Archive& ar) { ar(x, y, w, h); }
+    operator Rectangle() const { return {x, y, w, h}; };
 };
 
 enum Action : int16_t {
     // Load world
-    LOAD_CUSTOM_WORLD = SHRT_MIN,
-    LOAD_CANNON_WORLD = SHRT_MIN/2,
+    LOAD_CUSTOM_WORLD = SHRT_MIN, // TODO()
+    LOAD_CANNON_WORLD = SHRT_MIN*2/3,
+    LOAD_UI = SHRT_MIN/3,
 
     // Actions that can be called from any world
     NORMAL_ACTION = 0,
@@ -59,19 +66,19 @@ struct ControlScheme {
     KeyboardKey move_down   = KEY_DOWN;
     KeyboardKey move_left   = KEY_LEFT;
     KeyboardKey move_right  = KEY_RIGHT;
-    // KeyboardKey nav_up      = KEY_W;
-    // KeyboardKey nav_down    = KEY_S;
-    // KeyboardKey nav_left    = KEY_A;
-    // KeyboardKey nav_right   = KEY_UP;
+    KeyboardKey nav_up      = KEY_W;
+    KeyboardKey nav_down    = KEY_S;
+    KeyboardKey nav_left    = KEY_A;
+    KeyboardKey nav_right   = KEY_UP;
     /*/
     KeyboardKey move_up     = KEY_W;
     KeyboardKey move_down   = KEY_S;
     KeyboardKey move_left   = KEY_A;
     KeyboardKey move_right  = KEY_D;
-    // KeyboardKey nav_up      = KEY_UP;
-    // KeyboardKey nav_down    = KEY_DOWN;
-    // KeyboardKey nav_left    = KEY_LEFT;
-    // KeyboardKey nav_right   = KEY_RIGHT;
+    KeyboardKey nav_up      = KEY_UP;
+    KeyboardKey nav_down    = KEY_DOWN;
+    KeyboardKey nav_left    = KEY_LEFT;
+    KeyboardKey nav_right   = KEY_RIGHT;
     //*/
     KeyboardKey jump        = KEY_SPACE;
     KeyboardKey select      = KEY_ENTER;

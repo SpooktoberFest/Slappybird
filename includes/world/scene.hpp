@@ -20,18 +20,20 @@ public:
     virtual ~Scene() {};
 
     // Loaded Entities
-    Player player;
+    Chararacter _player;
     std::vector<Pipe> _pipes;
     std::vector<Button> _buttons;
     std::vector<Platform> _platforms;
-    short _selected;
+
+    unsigned short _selected;
 
     // Level Parameters
-    float _pipe_width = 60.0f;
+    float _pipe_width = 2_b;
     float _gap_height = 150.0f;
     float _gravity = 0.5f;
     float _jump_strength = -8.0f;
     float _pipe_speed = 3.0f;
+    float _move_speed = 5.0f;
     Vec2 _camera_velocity = {QNAN, QNAN}; // Where QNAN means follow player
 
     // Level State
@@ -41,7 +43,7 @@ public:
     // Serialization function for cereal
     template <class Archive>
     void serialize(Archive& ar) {
-        ar(_pipes, _buttons, _platforms, _selected,
+        ar(_player, _pipes, _buttons, _platforms, _selected,
            _pipe_width, _gap_height, _gravity, _jump_strength, _pipe_speed,
            _camera_velocity, _score, _camera_position);
     }

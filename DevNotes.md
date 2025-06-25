@@ -13,19 +13,20 @@ Now:
 
 
 Soon:
+- Level Creator
 - Other Levels
 - Basic Enemies
 - Attack Speed
 - Boost Panels
 - Toggleable Blocks
 
+
 ----
 
 
 Later:
+- Profiles
 - Expand Moveset
-- Save Profiles
-- Scenes as Save Files
 - Equipment
 - More Enemies
 

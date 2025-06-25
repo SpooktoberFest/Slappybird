@@ -10,32 +10,34 @@
 #include <cereal/types/vector.hpp>
 #include <cereal/types/memory.hpp>
 
-struct Player {
-    Rect hitbox = {100, 450/2, 34, 24};
-    Vec2 velocity;
-    float move_speed = 5.0f;
+
+
+struct Chararacter {
+    Vec2 pos;
+    Vec2 vel;
+
+    template <class Archive>
+    void serialize(Archive& ar) { ar(vel, pos); }
+    constexpr Rect box(float w, float h) const
+        { return Rect{pos.x, pos.y, std::move(w), std::move(h)}; };
 };
 
 struct Pipe {
-    float x;
-    float gapY;
-    Rect topRect;
-    Rect bottomRect;
+    Vec2 pos;
     bool passed;
 
     template <class Archive>
-    void serialize(Archive& ar) {
-        ar(x, gapY, topRect, bottomRect, passed);
-    }
+    void serialize(Archive& ar) { ar(pos);};
+
+    constexpr std::array<Rect, 2> box(const float w, const float h) const
+        { return {Rect{pos.x, 0, w, pos.y}, Rect{pos.x, pos.y+h, w, 12_b}}; };
 };
 
 struct Platform {
     Rect rect;
 
     template <class Archive>
-    void serialize(Archive& ar) {
-        ar(rect);
-    }
+    void serialize(Archive& ar) { ar(rect); }
 };
 
 struct Button {
@@ -44,9 +46,7 @@ struct Button {
     Action action;
 
     template <class Archive>
-    void serialize(Archive& ar) {
-        ar(rect, text, action);
-    }
+    void serialize(Archive& ar) { ar(rect, text, action); }
 };
 
 
