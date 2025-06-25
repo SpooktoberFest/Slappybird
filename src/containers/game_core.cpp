@@ -8,10 +8,12 @@
 const static auto src = "Game";
 
 Game::Game() {
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE); // FLAG_FULLSCREEN_MODE
     InitWindow(_resoulution.x, _resoulution.y, "Super Flappy Kendoka Person!");
     // InitAudioDevice();
     SetTargetFPS(60);
     SetExitKey(KEY_NULL);
+
 
     _gradient_shader = LoadShader(0, "resources/shaders/gradient.fs");
     update_resolution(true);

@@ -11,10 +11,7 @@ void Game::simulate() {
 
     handle_input();
 
-    if (_gamestate > GameState::PAUSED) return;
-
-
-    if (_gamestate > GameState::GAMEOVER) return;
+    if (_gamestate >= GameState::PAUSED) return;
 
     // Update Bird
     {
@@ -25,7 +22,7 @@ void Game::simulate() {
     }
 
 
-    if (_gamestate > GameState::RUNNING) return;
+    if (_gamestate >= GameState::GAMEOVER) return;
     
     // Update Camera
     {
@@ -179,13 +176,17 @@ void Game::handle_collision() {
 
         // Check player-pipe collisions
         auto hboxes = pipe.box(_scene._pipe_width, _scene._gap_height);
-        if (CheckCollisionRecs(p1box, std::move(hboxes[0])) ||
-            CheckCollisionRecs(p1box, std::move(hboxes[1]))) {
+        if (CheckCollisionRecs(p1box, hboxes[0]) ||
+            CheckCollisionRecs(p1box, hboxes[1])) {
             _gamestate = GameState::GAMEOVER;
         }
 
         // Scoring
-        if (!pipe.passed && pipe.pos.x + _scene._pipe_width < p1box.x) {
+        if (!pipe.passed &&
+            pipe.pos.x + _scene._pipe_width < p1box.x &&
+            p1box.y > hboxes[0].y &&
+            p1box.y < hboxes[1].y
+        ) {
             pipe.passed = true;
             _scene._score++;
         }

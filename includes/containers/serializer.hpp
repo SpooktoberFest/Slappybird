@@ -8,7 +8,7 @@
 
 class Serializer {
 public:
-    Serializer();
+    Serializer() {};
     virtual ~Serializer() {};
 
     bool saveScene(int index);
@@ -20,13 +20,23 @@ public:
     bool saveProfile(std::string name);
     bool loadProfile(std::string name);
 
+    bool devModeTemplate();
+    bool devModeLoad(std::string path);
+
 private:
+
+    bool devSaveScene(std::string path, std::string scene_str);
+    bool devSaveProfile(std::string path, std::string profile_str);
+
+
+    std::string devScene(Scene scene);
+    std::string devProfile(Profile profile);
+
     Scene loaded_scene;
     Profile loaded_profile;
     const static std::string cannon_scenes_path;
     const static std::string custom_scenes_path;
     const static std::string profiles_path;
-
 };
 
 

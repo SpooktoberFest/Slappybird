@@ -3,28 +3,33 @@
 # To do:
 
 Now:
-- Spawners
-- Basic Attack
-- Pause Menu
-- Level Select
+- Basic Level Creator **WIP**
+    - Template Creator
+    - Level/Profile/Etc Reader
+    - Pls better names
 
 
 ----
 
 
 Soon:
-- Level Creator
-- Other Levels
-- Basic Enemies
-- Attack Speed
-- Boost Panels
-- Toggleable Blocks
+- Pause Menus
+- Level Select
+- Spawners
+- Basic Attack
+
 
 
 ----
 
 
 Later:
+- Advanced Level Creator
+- Other Levels
+- Basic Enemies
+- Attack Speed
+- Boost Panels
+- Toggleable Blocks
 - Profiles
 - Expand Moveset
 - Equipment
