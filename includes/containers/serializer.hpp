@@ -2,8 +2,8 @@
 #define SUPERFLAPPY_SERIALIZER_HPP
 
 #include "scene.hpp"
+#include "properties.hpp"
 // #include "entities.hpp"
-// #include "properties.hpp"
 
 
 class Serializer {
@@ -21,7 +21,6 @@ public:
     bool loadProfile(std::string name);
 
 private:
-
     Scene loaded_scene;
     Profile loaded_profile;
     const static std::string cannon_scenes_path;

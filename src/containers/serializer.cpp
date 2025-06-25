@@ -1,6 +1,7 @@
 #include "serializer.hpp"
 
 #include <cereal/archives/binary.hpp>
+
 #include <fstream>
 
 #include "debug.hpp"

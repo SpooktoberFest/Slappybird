@@ -81,16 +81,16 @@ void Game::handle_input() {
     // Mouse & Buttons
     if (_scene._buttons.size() > 0) {
         // Move selection
-        if (IsKeyPressed(_controls.nav_left)) {
+        if (IsKeyPressed(_controls.nav[LEFT])) {
             _scene._selected += 8;
         }
-        if (IsKeyPressed(_controls.nav_right)) {
+        if (IsKeyPressed(_controls.nav[RIGHT])) {
             _scene._selected -= 8;
         }
-        if (IsKeyPressed(_controls.nav_up)) {
+        if (IsKeyPressed(_controls.nav[UP])) {
             --_scene._selected;
         }
-        if (IsKeyPressed(_controls.nav_down)) {
+        if (IsKeyPressed(_controls.nav[DOWN])) {
             ++_scene._selected;
         }
         _scene._selected %= _scene._buttons.size();
@@ -115,16 +115,16 @@ void Game::handle_input() {
     if (IsKeyPressed(_controls.jump)) {
         _scene._player.vel.y = _scene._jump_strength;
     }
-    if (IsKeyDown(_controls.move_left)) {
+    if (IsKeyDown(_controls.move[LEFT])) {
         _scene._player.pos.x -= _scene._move_speed;
     }
-    if (IsKeyDown(_controls.move_right)) {
+    if (IsKeyDown(_controls.move[RIGHT])) {
         _scene._player.pos.x += _scene._move_speed;
     }
-    if (IsKeyDown(_controls.move_up)) {
+    if (IsKeyDown(_controls.move[UP])) {
         _scene._player.pos.y -= _scene._move_speed;
     }
-    if (IsKeyDown(_controls.move_down)) {
+    if (IsKeyDown(_controls.move[DOWN])) {
         _scene._player.pos.y += _scene._move_speed;
     }
 }

@@ -8,7 +8,6 @@
 #include <array>
 
 #include <cereal/types/vector.hpp>
-#include <cereal/types/memory.hpp>
 
 #include "entities.hpp"
 

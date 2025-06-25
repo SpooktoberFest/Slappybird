@@ -2,13 +2,11 @@
 #define SUPERFLAPPY_ENTITIES_HPP
 
 #include "raylib.h"
-#include <vector>
 #include <string>
 
 #include "properties.hpp"
 
-#include <cereal/types/vector.hpp>
-#include <cereal/types/memory.hpp>
+#include <cereal/types/string.hpp>
 
 
 
