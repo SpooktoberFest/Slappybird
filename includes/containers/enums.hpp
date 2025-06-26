@@ -37,7 +37,7 @@ enum class Equipment : u_int16_t {
     RAINBOW_L, RAINBOW_G, RAINBOW_T,
 };
 
-enum class Technique : int16_t {
+enum class Technique : u_int16_t {
     NONE,
     MEN, DO, KOTE
 };

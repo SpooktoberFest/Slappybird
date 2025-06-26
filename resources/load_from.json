@@ -1,0 +1,47 @@
+{
+  "cannon_scenes": [
+    {
+      "name": "pause.menu",
+      "data": {
+            "_buttons": []
+        }
+    }
+  ],
+  "custom_scenes": [
+    {
+      "name": "template.scene",
+      "data": {
+            "_player": {
+                "pos": [100, 100],
+                "vel": [0, 0]
+            },
+            "_pipes": [
+              { "pos": [100, 100] }
+            ],
+            "_buttons": [
+              { "rect": [100, 100, 100, 100], "text": "hello", "action": 1 }
+            ],
+            "_platforms": [
+              { "rect": [100, 100, 100, 100] }
+            ],
+            "_pipe_width": 64.0,
+            "_gap_height": 150.0,
+            "_gravity": 0.5,
+            "_jump_strength": -8.0,
+            "_pipe_speed": 3.0,
+            "_score": 0,
+            "_camera_velocity": [0, 0],
+            "_camera_position": [100, 100]
+        }
+    }
+  ],
+  "profiles": [
+    {
+      "name": "empty.profile",
+      "data": {
+        "_sets": [] ,
+        "_movesets": []
+      }
+    }
+  ]
+}

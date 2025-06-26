@@ -3,21 +3,17 @@
 # To do:
 
 Now:
-- Basic Level Creator **WIP**
-    - Template Creator
-    - Level/Profile/Etc Reader
-    - Pls better names
+- Cleanup and better names
+- Pause Menus
+- Level Select
 
 
 ----
 
 
 Soon:
-- Pause Menus
-- Level Select
 - Spawners
 - Basic Attack
-
 
 
 ----

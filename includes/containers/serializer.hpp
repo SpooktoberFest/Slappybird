@@ -1,6 +1,11 @@
 #ifndef SUPERFLAPPY_SERIALIZER_HPP
 #define SUPERFLAPPY_SERIALIZER_HPP
 
+#include <optional>
+#include <memory>
+
+#include <nlohmann/json.hpp>
+
 #include "scene.hpp"
 #include "properties.hpp"
 // #include "entities.hpp"
@@ -11,26 +16,17 @@ public:
     Serializer() {};
     virtual ~Serializer() {};
 
-    bool saveScene(int index);
-    bool loadScene(int index);
+    bool saveScene(std::string name, bool custom, Scene* scene_opt=nullptr);
+    bool loadScene(std::string name, bool custom, Scene* scene_opt=nullptr);
 
-    bool saveCostumScene(std::string name);
-    bool loadCostumScene(std::string name);
+    bool saveProfile(std::string name, Profile* profile_opt=nullptr);
+    bool loadProfile(std::string name, Profile* profile_opt=nullptr);
 
-    bool saveProfile(std::string name);
-    bool loadProfile(std::string name);
-
-    bool devModeTemplate();
     bool devModeLoad(std::string path);
 
 private:
 
-    bool devSaveScene(std::string path, std::string scene_str);
-    bool devSaveProfile(std::string path, std::string profile_str);
-
-
-    std::string devScene(Scene scene);
-    std::string devProfile(Profile profile);
+    std::optional<Scene> from_json(const nlohmann::json& j);
 
     Scene loaded_scene;
     Profile loaded_profile;

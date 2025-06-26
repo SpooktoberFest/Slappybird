@@ -1,6 +1,9 @@
 
 #include <ctime>
 #include "game.hpp"
+#include "debug.hpp"
+
+const static auto src = "Main";
 
 int main(int argc, char** argv) {
     {
@@ -16,10 +19,7 @@ int main(int argc, char** argv) {
             }
         } else if (argc == 2) {
             Serializer serializer;
-            if (argv[1] == "template")
-                serializer.devModeTemplate();
-            else 
-                serializer.devModeLoad(argv[1]);
+            serializer.devModeLoad(argv[1]);
             
         }
 

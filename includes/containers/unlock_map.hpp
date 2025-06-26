@@ -16,6 +16,7 @@ class unlock_map {
 
 public:
 	unlock_map() = default;
+	unlock_map(std::vector<U> vec) : m_map(std::move(vec)) {};
 	~unlock_map() = default;
 
 	void push(const T& item) {

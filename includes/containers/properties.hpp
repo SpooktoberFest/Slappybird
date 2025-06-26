@@ -2,12 +2,15 @@
 #define SUPERFLAPPY_PROPERTIES_HPP
 
 #include <array>
+#include <vector>
 
 #include "raylib.h"
 #include <cereal/types/array.hpp>
 
 #include "unlock_map.hpp"
 #include "enums.hpp"
+
+class Serializer; // Forward declaration
 
 // Literal for block unit
 constexpr float operator"" _b(unsigned long long value) {
@@ -64,15 +67,11 @@ struct ControlScheme {
 };
 
 struct Profile {
-    int a;
-    Equipment jump;
-    ControlScheme _controls;
-    Loadout _loadout;
     unlock_map<Equipment> _sets;
     unlock_map<Technique> _movesets;
 
     template <class Archive>
-    void serialize(Archive& ar) { ar(a, jump); };
+    void serialize(Archive& ar) { ar(_sets, _movesets); };
 };
 
 

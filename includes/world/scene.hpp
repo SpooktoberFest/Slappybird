@@ -13,7 +13,11 @@
 
 #define QNAN std::numeric_limits<float>::quiet_NaN()
 
+class Serializer; // Forward declaration
+
+
 class Scene {
+    friend class Serializer;
 public:
     Scene();
     virtual ~Scene() {};
@@ -42,9 +46,11 @@ public:
     // Serialization function for cereal
     template <class Archive>
     void serialize(Archive& ar) {
-        ar(_player, _pipes, _buttons, _platforms, _selected,
+        ar(
+            _player, _pipes, _buttons, _platforms,
            _pipe_width, _gap_height, _gravity, _jump_strength, _pipe_speed,
-           _camera_velocity, _score, _camera_position);
+           _camera_velocity, _score, _camera_position
+        );
     }
 };
 
