@@ -3,8 +3,8 @@
 #include <fstream>
 #include <sstream>
 
-// #include <cereal/archives/json.hpp>
 #include <cereal/archives/binary.hpp>
+// #include <sqlite3.h>
 
 #include "debug.hpp"
 
@@ -13,7 +13,7 @@ const static auto src = "Serializer";
 
 using json = nlohmann::json;
 
-const std::string Serializer::cannon_scenes_path = "resources/scenes/";
+const std::string Serializer::cannon_scenes_path = "resources/scenes.db";
 const std::string Serializer::custom_scenes_path = "resources/custom_scenes/";
 const std::string Serializer::profiles_path = "resources/profiles/";
 
@@ -212,3 +212,94 @@ std::optional<Scene> Serializer::from_json(const json& json_data) {
 }
 
 
+// std::optional<Scene> Serializer::fetchScene(const std::string& name, bool custom) {
+//     sqlite3* db = nullptr;
+//     if (sqlite3_open((custom ? custom_scenes_path : cannon_scenes_path).c_str(), &db) != SQLITE_OK) {
+//         LOG_ERROR(src, "Cannot open database: " + std::string(sqlite3_errmsg(db)));
+//         return std::nullopt;
+//     }
+
+//     const char* query = "SELECT data FROM scenes WHERE name = ?";
+//     sqlite3_stmt* stmt = nullptr;
+//     if (sqlite3_prepare_v2(db, query, -1, &stmt, nullptr) != SQLITE_OK) {
+//         sqlite3_close(db);
+//         LOG_ERROR(src, "Failed to prepare SQL statement");
+//         return std::nullopt;
+//     }
+
+//     sqlite3_bind_text(stmt, 1, name.c_str(), -1, SQLITE_TRANSIENT);
+
+//     std::optional<Scene> result;
+
+//     if (sqlite3_step(stmt) == SQLITE_ROW) {
+//         const void* blob = sqlite3_column_blob(stmt, 0);
+//         int blob_size = sqlite3_column_bytes(stmt, 0);
+
+//         std::istringstream iss(std::string(reinterpret_cast<const char*>(blob), blob_size));
+//         Scene scene;
+//         try {
+//             cereal::BinaryInputArchive archive(iss);
+//             archive(scene);
+//             result = scene;
+//         } catch (const std::exception& e) {
+//             LOG_ERROR(src, "Deserialization failed: " + std::string(e.what()));
+//         }
+//     } else {
+//         LOG_ERROR(src, "Scene not found: " + name);
+//     }
+
+//     sqlite3_finalize(stmt);
+//     sqlite3_close(db);
+//     return result;
+// }
+
+
+// bool Serializer::saveSceneToDB(const std::string& name, const Scene& scene, bool custom) {
+//     sqlite3* db = nullptr;
+//     const std::string db_path = custom ? custom_scenes_path : cannon_scenes_path;
+
+//     if (sqlite3_open(db_path.c_str(), &db) != SQLITE_OK) {
+//         LOG_ERROR(src, "Cannot open database: " + std::string(sqlite3_errmsg(db)));
+//         return false;
+//     }
+
+//     const char* query = R"(
+//         INSERT INTO scenes (name, data)
+//         VALUES (?, ?)
+//         ON CONFLICT(name) DO UPDATE SET data = excluded.data
+//     )";
+
+//     sqlite3_stmt* stmt = nullptr;
+//     if (sqlite3_prepare_v2(db, query, -1, &stmt, nullptr) != SQLITE_OK) {
+//         LOG_ERROR(src, "Failed to prepare SQL statement: " + std::string(sqlite3_errmsg(db)));
+//         sqlite3_close(db);
+//         return false;
+//     }
+
+//     // Serialize scene to binary blob
+//     std::ostringstream oss(std::ios::binary);
+//     try {
+//         cereal::BinaryOutputArchive archive(oss);
+//         archive(scene);
+//     } catch (const std::exception& e) {
+//         LOG_ERROR(src, "Serialization failed: " + std::string(e.what()));
+//         sqlite3_finalize(stmt);
+//         sqlite3_close(db);
+//         return false;
+//     }
+
+//     std::string blob = oss.str();
+
+//     sqlite3_bind_text(stmt, 1, name.c_str(), -1, SQLITE_TRANSIENT);
+//     sqlite3_bind_blob(stmt, 2, blob.data(), static_cast<int>(blob.size()), SQLITE_TRANSIENT);
+
+//     bool success = true;
+//     if (sqlite3_step(stmt) != SQLITE_DONE) {
+//         LOG_ERROR(src, "Failed to insert or update scene: " + std::string(sqlite3_errmsg(db)));
+//         success = false;
+//     }
+
+//     sqlite3_finalize(stmt);
+//     sqlite3_close(db);
+//     return success;
+// }

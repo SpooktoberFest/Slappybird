@@ -28,6 +28,14 @@ private:
 
     std::optional<Scene> from_json(const nlohmann::json& j);
 
+    // std::optional<Scene> fetch_scene(const std::string& name, bool custom);
+    // void send_scene(const std::string& name, bool custom);
+    // std::optional<Profile> fetch_profile(const std::string& name);
+    // void send_profile(const std::string& name);
+
+    bool saveSceneToDB(const std::string& name, const Scene& scene, bool custom);
+
+
     Scene loaded_scene;
     Profile loaded_profile;
     const static std::string cannon_scenes_path;

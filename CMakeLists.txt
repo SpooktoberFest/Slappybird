@@ -9,6 +9,7 @@ endif()
 
 set(CMAKE_CXX_STANDARD 17)
 
+find_package(SQLite3 REQUIRED)
 find_package(raylib REQUIRED)
 
 file(GLOB_RECURSE SOURCES "src/*.cpp")
@@ -27,6 +28,7 @@ target_include_directories(${EXECUTABLE_NAME} PRIVATE
 
 target_link_libraries(${EXECUTABLE_NAME}
     raylib
+    SQLite::SQLite3
 )
 
 if(UNIX AND NOT APPLE)
