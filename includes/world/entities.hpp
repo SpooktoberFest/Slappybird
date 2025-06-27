@@ -14,37 +14,46 @@ struct Chararacter {
     Vec2 pos;
     Vec2 vel;
 
+    constexpr Rectangle rect(float w, float h) const
+        { return Rectangle{pos.x, pos.y, std::move(w), std::move(h)}; };
+
     template <class Archive>
     void serialize(Archive& ar) { ar(vel, pos); }
-    constexpr Rect box(float w, float h) const
-        { return Rect{pos.x, pos.y, std::move(w), std::move(h)}; };
 };
 
 struct Pipe {
     Vec2 pos;
     bool passed;
 
+    constexpr std::array<Rectangle, 2> rect(const float w, const float h) const
+        { return {Rectangle{pos.x, 0, w, pos.y}, Rectangle{pos.x, pos.y+h, w, 12_b}}; };
+
     template <class Archive>
     void serialize(Archive& ar) { ar(pos);};
-
-    constexpr std::array<Rect, 2> box(const float w, const float h) const
-        { return {Rect{pos.x, 0, w, pos.y}, Rect{pos.x, pos.y+h, w, 12_b}}; };
 };
 
 struct Platform {
-    Rect rect;
+    Vec2 pos;
+    Vec2 size;
+
+    constexpr Rectangle rect() const
+        { return Rectangle{pos.x, pos.y, size.x, size.y}; };
 
     template <class Archive>
-    void serialize(Archive& ar) { ar(rect); }
+    void serialize(Archive& ar) { ar(pos, size); }
 };
 
 struct Button {
-    Rect rect;
+    Vec2 pos;
+    Vec2 size;
     std::string text;
     Action action;
 
+    constexpr Rectangle rect() const
+        { return Rectangle{pos.x, pos.y, size.x, size.y}; };    
+
     template <class Archive>
-    void serialize(Archive& ar) { ar(rect, text, action); }
+    void serialize(Archive& ar) { ar(pos, size, text, action); }
 };
 
 

@@ -26,28 +26,16 @@ struct Vec2 {
     operator Vector2() const { return {x, y}; };
 };
 
-struct Rect {
-    float x;
-    float y;
-    float w = 1_b;
-    float h = 1_b;
-
-    template <class Archive>
-    void serialize(Archive& ar) { ar(x, y, w, h); };
-    operator Rectangle() const { return {x, y, w, h}; };
-};
-
 struct Loadout {
-    Equipment _men;
-    Equipment _do;
-    Equipment _kote;
-    Equipment _gi;
-    Equipment _hakama;
-    Equipment _shinai;
-    std::array<Technique, 4> _moveset;
+    Equipment head;
+    Equipment torso;
+    Equipment hands;
+    Equipment legs;
+    Equipment weapon;
+    std::array<Technique, 4> moveset;
 
     template <class Archive>
-    void serialize(Archive& ar) { ar(_men, _do, _kote, _gi, _hakama, _shinai, _moveset); };
+    void serialize(Archive& ar) { ar(head, torso, hands, legs, weapon, moveset); };
 };
 
 struct ControlScheme {
@@ -67,11 +55,11 @@ struct ControlScheme {
 };
 
 struct Profile {
-    unlock_map<Equipment> _sets;
-    unlock_map<Technique> _movesets;
+    unlock_map<Equipment> equipment;
+    unlock_map<Technique> moves;
 
     template <class Archive>
-    void serialize(Archive& ar) { ar(_sets, _movesets); };
+    void serialize(Archive& ar) { ar(equipment, moves); };
 };
 
 

@@ -20,12 +20,12 @@ Scene::Scene() {
     }
 
     _platforms.push_back(
-        {{5_b, 15_b, 5_b, 1_b}}
+        {{5_b, 15_b}, {5_b, 1_b}}
     );
 
     _buttons = {
-        Button{{20_b, 5_b, 5_b, 2_b}, "Button 1", Action::TOGGLE_GROUP_1},
-        Button{{20_b, 8_b, 5_b, 2_b}, "Button 2", Action::TOGGLE_GROUP_2}
+        Button{{20_b, 5_b}, {5_b, 2_b}, "Button 1", Action::TOGGLE_GROUP_1},
+        Button{{20_b, 8_b}, {5_b, 2_b}, "Button 2", Action::TOGGLE_GROUP_2}
     };
 };
 

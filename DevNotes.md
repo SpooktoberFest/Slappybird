@@ -3,7 +3,6 @@
 # To do:
 
 Now:
-- Cleanup and better names
 - Pause Menus
 - Level Select
 

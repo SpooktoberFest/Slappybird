@@ -44,7 +44,7 @@ private:
     GameState _gamestate = GameState::INIT;
 
     // Window Properties
-    Vector2 _resoulution = {800, 450};
+    Vector2 _res = {800, 450}; // Window resolution
 
     // Misc
     Shader _gradient_shader;

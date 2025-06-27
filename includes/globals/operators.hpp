@@ -22,12 +22,12 @@ constexpr Vec2 operator-(const Vec2& minuend, const Vec2& subraend) {
     };
 }
 
-constexpr Rect operator-(const Rect& minuend, const Vec2& subraend) {
+constexpr Rectangle operator-(const Rectangle& minuend, const Vec2& subraend) {
     return {
         minuend.x - subraend.x,
         minuend.y - subraend.y,
-        minuend.w,
-        minuend.h
+        minuend.width,
+        minuend.height
     };
 }
 

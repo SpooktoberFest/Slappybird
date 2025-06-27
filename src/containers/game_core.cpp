@@ -9,7 +9,7 @@ const static auto src = "Game";
 
 Game::Game() {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE); // FLAG_FULLSCREEN_MODE
-    InitWindow(_resoulution.x, _resoulution.y, "Super Flappy Kendoka Person!");
+    InitWindow(_res.x, _res.y, "Super Flappy Kendoka Person!");
     // InitAudioDevice();
     SetTargetFPS(60);
     SetExitKey(KEY_NULL);
@@ -35,37 +35,37 @@ void Game::render() {
 
     // Background
     BeginShaderMode(_gradient_shader);
-    DrawRectangle(0, 0, _resoulution.x, _resoulution.y, WHITE);
+    DrawRectangle(0, 0, _res.x, _res.y, WHITE);
     EndShaderMode();
 
     // Pipes
     for (const auto& pipe : _scene._pipes) {
-        auto hboxes = pipe.box(_scene._pipe_width, _scene._gap_height);
-        DrawRectangleRec(std::move(hboxes[0]) - _scene._camera_position, GREEN);
-        DrawRectangleRec(std::move(hboxes[1]) - _scene._camera_position, GREEN);
+        auto hitboxes = pipe.rect(_scene._pipe_width, _scene._gap_height);
+        DrawRectangleRec(std::move(hitboxes[0]) - _scene._cam_pos, GREEN);
+        DrawRectangleRec(std::move(hitboxes[1]) - _scene._cam_pos, GREEN);
     }
 
     // Platforms
     for (const auto& platform : _scene._platforms) {
-        DrawRectangleRec(platform.rect - _scene._camera_position, BROWN);
+        DrawRectangleRec(platform.rect() - _scene._cam_pos, BROWN);
     }
 
     // Buttons
     for (const auto& button : _scene._buttons) {
-        DrawRectangleRec(button.rect, WHITE);
-        DrawText(button.text.c_str(), button.rect.x + 5, button.rect.y + 5, 20, DARKGRAY);
+        DrawRectangleRec(button.rect(), WHITE);
+        DrawText(button.text.c_str(), button.pos.x + 5, button.pos.y + 5, 20, DARKGRAY);
     }
     if (_scene._selected < _scene._buttons.size())
-        DrawRectangleLinesEx(_scene._buttons[_scene._selected].rect, 5.0f, YELLOW);
+        DrawRectangleLinesEx(_scene._buttons[_scene._selected].rect(), 5.0f, YELLOW);
 
     // Player
-    DrawRectangleRec(_scene._player.box(1_b, 2_b) - _scene._camera_position, WHITE);
+    DrawRectangleRec(_scene._player.rect(1_b, 2_b) - _scene._cam_pos, WHITE);
 
     // Text
-    DrawText(TextFormat("Score: %d", _scene._score), _resoulution.x - 150, 10, 20, BLUE);
+    DrawText(TextFormat("Score: %d", _scene._score), _res.x - 150, 10, 20, BLUE);
     DrawText("Slappy Bird (Raylib)", 10, 10, 20, DARKGRAY);
     if (_gamestate == GameState::QUIT) {
-        DrawText("Game Over! Press R to Restart", _resoulution.x /2 - 160, _resoulution.y /2 - 10, 20, MAROON);
+        DrawText("Game Over! Press R to Restart", _res.x /2 - 160, _res.y /2 - 10, 20, MAROON);
     }
 
     EndDrawing();
@@ -73,8 +73,8 @@ void Game::render() {
 
 void Game::update_resolution(const bool override) {
     Vector2 res = {(float)GetScreenWidth(), (float)GetScreenHeight()};
-    if (override || !(res == _resoulution)) {
-        _resoulution = res;
+    if (override || !(res == _res)) {
+        _res = res;
         SetShaderValue(
             _gradient_shader,
             GetShaderLocation(_gradient_shader, "resolution"),

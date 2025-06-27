@@ -13,7 +13,7 @@ const static auto src = "Serializer";
 
 using json = nlohmann::json;
 
-const std::string Serializer::cannon_scenes_path = "resources/scenes.db";
+const std::string Serializer::cannon_scenes_path = "resources/cannon_scenes/";
 const std::string Serializer::custom_scenes_path = "resources/custom_scenes/";
 const std::string Serializer::profiles_path = "resources/profiles/";
 
@@ -124,8 +124,8 @@ bool Serializer::devModeLoad(std::string path) {
                     std::string name = profile_json["name"];
                     const auto& profile_data = profile_json["data"];
                     Profile profile;
-                    profile._sets = unlock_map<Equipment>(profile_data.value("_sets", std::vector<u_int16_t>()));
-                    profile._movesets = unlock_map<Technique>(profile_data.value("_movesets", std::vector<u_int16_t>()));
+                    profile.equipment = unlock_map<Equipment>(profile_data.value("_sets", std::vector<u_int16_t>()));
+                    profile.moves = unlock_map<Technique>(profile_data.value("_movesets", std::vector<u_int16_t>()));
                     saveProfile(name, &profile);
                 } catch (const std::exception& e) {
                     LOG_ERROR(src, "Failed to parse profile: " + std::string(e.what()));
@@ -152,8 +152,6 @@ std::optional<Scene> Serializer::from_json(const json& json_data) {
         { if (json_data.count(name)) { target = json_data[name].get<float>(); } };
     const auto get_vec2 = [&tmp](const json& json_data, Vec2& target, std::string name)
         { if (json_data.count(name)) { tmp = json_data[name].get<std::vector<float>>(); target = {tmp[0], tmp[1]};} };
-    const auto get_rect = [&tmp](const json& json_data, Rect& target, std::string name)
-        { if (json_data.count(name)) { tmp = json_data[name].get<std::vector<float>>(); target = {tmp[0], tmp[1], tmp[2], tmp[3]};} };
 
 
     try {
@@ -175,7 +173,8 @@ std::optional<Scene> Serializer::from_json(const json& json_data) {
         if (json_data.count("_buttons")) {
             Button button;
             for (const auto& json_elem : json_data["_buttons"]) {
-                get_rect(json_elem, button.rect, "rect");
+                get_vec2(json_elem, button.pos, "pos");
+                get_vec2(json_elem, button.size, "size");
                 button.action = json_elem["action"].get<Action>();
                 button.text = json_elem["text"].get<std::string>();
                 scene._buttons.push_back(std::move(button));
@@ -185,7 +184,8 @@ std::optional<Scene> Serializer::from_json(const json& json_data) {
         if (json_data.count("_platforms")) {
             Platform platform;
             for (const auto& json_elem : json_data["_pipes"]) {
-                get_rect(json_elem, platform.rect, "rect");
+                get_vec2(json_elem, platform.pos, "pos");
+                get_vec2(json_elem, platform.size, "size");
                 scene._platforms.push_back(std::move(platform));
             }
         };
@@ -201,8 +201,8 @@ std::optional<Scene> Serializer::from_json(const json& json_data) {
         breakpoint = "_score";
         scene._score = json_data.value("_score", 0);
         breakpoint = "camera";
-        get_vec2(json_data, scene._camera_velocity, "_camera_velocity");
-        get_vec2(json_data, scene._camera_position, "_camera_position");
+        get_vec2(json_data, scene._cam_vel, "_cam_vel");
+        get_vec2(json_data, scene._cam_pos, "_cam_pos");
 
         return scene;
     } catch (const std::exception& e) {

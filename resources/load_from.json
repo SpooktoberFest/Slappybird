@@ -19,10 +19,10 @@
               { "pos": [100, 100] }
             ],
             "_buttons": [
-              { "rect": [100, 100, 100, 100], "text": "hello", "action": 1 }
+              { "pos": [100, 100], "size": [100, 100], "text": "hello", "action": 1 }
             ],
             "_platforms": [
-              { "rect": [100, 100, 100, 100] }
+              { "pos": [100, 100], "size": [100, 100] }
             ],
             "_pipe_width": 64.0,
             "_gap_height": 150.0,
@@ -30,8 +30,8 @@
             "_jump_strength": -8.0,
             "_pipe_speed": 3.0,
             "_score": 0,
-            "_camera_velocity": [0, 0],
-            "_camera_position": [100, 100]
+            "_cam_vel": [0, 0],
+            "_cam_pos": [100, 100]
         }
     }
   ],
@@ -39,8 +39,8 @@
     {
       "name": "empty.profile",
       "data": {
-        "_sets": [] ,
-        "_movesets": []
+        "equipment": [] ,
+        "moves": []
       }
     }
   ]

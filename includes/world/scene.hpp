@@ -37,11 +37,9 @@ public:
     float _jump_strength = -8.0f;
     float _pipe_speed = 3.0f;
     float _move_speed = 5.0f;
-    Vec2 _camera_velocity = {QNAN, QNAN}; // Where QNAN means follow player
-
-    // Level State
+    Vec2 _cam_vel = {QNAN, QNAN}; // Where QNAN means follow player
+    Vec2 _cam_pos;
     unsigned short _score = 0;
-    Vec2 _camera_position;
 
     // Serialization function for cereal
     template <class Archive>
@@ -49,7 +47,7 @@ public:
         ar(
             _player, _pipes, _buttons, _platforms,
            _pipe_width, _gap_height, _gravity, _jump_strength, _pipe_speed,
-           _camera_velocity, _score, _camera_position
+           _cam_vel, _cam_pos, _score
         );
     }
 };
