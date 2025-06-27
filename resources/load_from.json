@@ -16,19 +16,23 @@
                 "vel": [0, 0]
             },
             "_pipes": [
-              { "pos": [100, 100] }
+              { "pos": [4, 4] }
             ],
             "_buttons": [
-              { "pos": [100, 100], "size": [100, 100], "text": "hello", "action": 1 }
+              { "pos": [20, 5], "size": [5, 2], "text": "hello", "action": 1 }
             ],
             "_platforms": [
-              { "pos": [100, 100], "size": [100, 100] }
+              { "pos": [5, 15], "size": [5, 1] }
             ],
+
             "_pipe_width": 64.0,
             "_gap_height": 150.0,
+            "_pipe_speed": 3.0,
+
+            "_move_speed": 5.0,
             "_gravity": 0.5,
             "_jump_strength": -8.0,
-            "_pipe_speed": 3.0,
+
             "_score": 0,
             "_cam_vel": [0, 0],
             "_cam_pos": [100, 100]

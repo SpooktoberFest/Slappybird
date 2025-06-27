@@ -10,20 +10,20 @@
 #include "unlock_map.hpp"
 #include "enums.hpp"
 
-class Serializer; // Forward declaration
+#define BLOCK 32.0f
 
 // Literal for block unit
 constexpr float operator"" _b(unsigned long long value) {
-    return static_cast<float>(value) * 32.0f;
+    return static_cast<float>(value) * BLOCK;
 }
 
 struct Vec2 {
     float x;
     float y;
 
+    operator Vector2() const { return {x, y}; };
     template <class Archive>
     void serialize(Archive& ar) { ar(x, y); };
-    operator Vector2() const { return {x, y}; };
 };
 
 struct Loadout {

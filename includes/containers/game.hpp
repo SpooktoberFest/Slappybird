@@ -40,6 +40,7 @@ private:
 
     // Game State
     Scene _scene;
+    std::vector<Button> _menu_buttons;
     const Scene* _scene_template;
     GameState _gamestate = GameState::INIT;
 

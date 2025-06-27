@@ -151,7 +151,7 @@ std::optional<Scene> Serializer::from_json(const json& json_data) {
     const auto get_f = [&json_data](float& target, std::string name)
         { if (json_data.count(name)) { target = json_data[name].get<float>(); } };
     const auto get_vec2 = [&tmp](const json& json_data, Vec2& target, std::string name)
-        { if (json_data.count(name)) { tmp = json_data[name].get<std::vector<float>>(); target = {tmp[0], tmp[1]};} };
+        { if (json_data.count(name)) { tmp = json_data[name].get<std::vector<float>>(); target = {tmp[0]*BLOCK, tmp[1]*BLOCK};} };
 
 
     try {
