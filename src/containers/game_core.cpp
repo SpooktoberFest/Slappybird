@@ -20,6 +20,14 @@ Game::Game() {
     set_background({{0.4f, 0.4f, 0.8f}}, {{0.2f, 0.2f, 0.4f}});
 
     LOG_INFO(src, "Initialized Raylib Components");
+
+    {
+        Menu menu;
+        _serializer.loadMenu("pause.menu", &menu);
+        _menus.push(std::move(menu));
+    }
+
+    LOG_INFO(src, "Loaded Resources");
     _gamestate = GameState::RUNNING;
 };
 
@@ -50,13 +58,25 @@ void Game::render() {
         DrawRectangleRec(platform.rect() - _scene._cam_pos, BROWN);
     }
 
-    // Buttons
+    // Scene Buttons
+    const bool is_running = _gamestate == GameState::RUNNING;
     for (const auto& button : _scene._buttons) {
-        DrawRectangleRec(button.rect(), WHITE);
+        DrawRectangleRec(button.rect(), (is_running ? WHITE : GRAY));
         DrawText(button.text.c_str(), button.pos.x + 5, button.pos.y + 5, 20, DARKGRAY);
+    } if (is_running) {
+        if (_scene._selected < _scene._buttons.size())
+            DrawRectangleLinesEx(_scene._buttons[_scene._selected].rect(), 5.0f, YELLOW);
     }
-    if (_scene._selected < _scene._buttons.size())
-        DrawRectangleLinesEx(_scene._buttons[_scene._selected].rect(), 5.0f, YELLOW);
+    // Menu Buttons
+    else {
+        const Menu& menu = _menus.top();
+        for (const auto& button : menu._buttons) {
+            DrawRectangleRec(button.rect(), WHITE);
+            DrawText(button.text.c_str(), button.pos.x + 5, button.pos.y + 5, 20, DARKGRAY);
+        }
+        if (menu._selected < menu._buttons.size())
+            DrawRectangleLinesEx(menu._buttons[menu._selected].rect(), 5.0f, YELLOW);
+    }
 
     // Player
     DrawRectangleRec(_scene._player.rect(1_b, 2_b) - _scene._cam_pos, WHITE);

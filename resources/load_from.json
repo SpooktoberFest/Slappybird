@@ -1,13 +1,16 @@
 {
-  "cannon_scenes": [
+  "menus": [
     {
       "name": "pause.menu",
       "data": {
-            "_buttons": []
+            "_buttons": [
+              { "pos": [20, 12], "size": [5, 2], "text": "Button 1", "action": 1 },
+              { "pos": [20, 7], "size": [5, 2], "text": "Button 2", "action": 2 }
+            ]
         }
     }
   ],
-  "custom_scenes": [
+  "scenes": [
     {
       "name": "template.scene",
       "data": {

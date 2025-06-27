@@ -6,7 +6,6 @@
 #include <vector>
 #include <optional>
 #include <array>
-
 #include <cereal/types/vector.hpp>
 
 #include "entities.hpp"
@@ -48,6 +47,16 @@ public:
             _move_speed, _gravity, _jump_strength,
            _cam_vel, _cam_pos, _score
         );
+    }
+};
+
+struct Menu {
+    std::vector<Button> _buttons;
+    unsigned short _selected;
+
+    template <class Archive>
+    void serialize(Archive& ar) {
+        ar(_buttons);
     }
 };
 

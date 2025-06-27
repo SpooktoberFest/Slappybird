@@ -59,71 +59,55 @@ void Game::handle_input() {
     if (IsKeyPressed(_controls.pause)) {
         switch (_gamestate) {
         case GameState::PAUSED:
-            _gamestate = GameState::RUNNING;
-            break;
+            _gamestate = GameState::RUNNING; break;
         case GameState::RUNNING:
-            _gamestate = GameState::PAUSED;
-            break;
+            _gamestate = GameState::PAUSED; break;
         case GameState::GAMEOVER:
-            _gamestate = GameState::PAUSED_GAMEOVER;
-            break;
+            _gamestate = GameState::PAUSED_GAMEOVER; break;
         case GameState::PAUSED_GAMEOVER:
-            _gamestate = GameState::GAMEOVER;
-            break;
-        default:
-            break;
+            _gamestate = GameState::GAMEOVER; break;
+        default: break;
         }
     }
 
     // Mouse & Buttons
-    if (_scene._buttons.size() > 0) {
-        // Move selection
-        if (IsKeyPressed(_controls.nav[LEFT])) {
-            _scene._selected += 8;
-        }
-        if (IsKeyPressed(_controls.nav[RIGHT])) {
-            _scene._selected -= 8;
-        }
-        if (IsKeyPressed(_controls.nav[UP])) {
-            --_scene._selected;
-        }
-        if (IsKeyPressed(_controls.nav[DOWN])) {
-            ++_scene._selected;
-        }
-        _scene._selected %= _scene._buttons.size();
+    if (_scene._buttons.size() > 0 || _gamestate == GameState::PAUSED) {
+        const bool paused = bool(_gamestate == GameState::PAUSED);
+        auto& index =   paused ? _menus.top()._selected : _scene._selected;
+        auto& buttons = paused ? _menus.top()._buttons : _scene._buttons;
+
+        // Navigation keys
+        if (IsKeyPressed(_controls.nav[LEFT]))  index += 8;
+        if (IsKeyPressed(_controls.nav[RIGHT])) index -= 8;
+        if (IsKeyPressed(_controls.nav[UP]))    --index;
+        if (IsKeyPressed(_controls.nav[DOWN]))  ++index;
+        index %= buttons.size();
+
+        // Mouse hover
         Vector2 mouse_pos = GetMousePosition();
-        for (short i = 0; i < _scene._buttons.size(); ++i) {
-            if (CheckCollisionPointRec(mouse_pos, _scene._buttons[i].rect())) {
-                _scene._selected = i;
-                if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                    handle_action(_scene._buttons[_scene._selected].action);
-                }
+        for (short i = 0; i < buttons.size(); ++i) {
+            if (CheckCollisionPointRec(mouse_pos, buttons[i].rect())) {
+                index = i;
+                // Mouse click
+                if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+                    handle_action(buttons[index].action);
                 break;
             }
         }
+        // Select key
         if (IsKeyPressed(_controls.select)) {
-            handle_action(_scene._buttons[_scene._selected].action);
+            handle_action(buttons[index].action);
         }
     }
 
     if (_gamestate > GameState::RUNNING) return;
 
     // Move player
-    if (IsKeyPressed(_controls.jump)) {
-        _scene._player.vel.y = _scene._jump_strength;
-    }
-    if (IsKeyDown(_controls.move[LEFT])) {
-        _scene._player.pos.x -= _scene._move_speed;
-    }
-    if (IsKeyDown(_controls.move[RIGHT])) {
-        _scene._player.pos.x += _scene._move_speed;
-    }
-    if (IsKeyDown(_controls.move[UP])) {
-        _scene._player.pos.y -= _scene._move_speed;
-    }
-    if (IsKeyDown(_controls.move[DOWN])) {
-        _scene._player.pos.y += _scene._move_speed;
-    }
+    if (IsKeyPressed(_controls.jump))       _scene._player.vel.y = _scene._jump_strength;
+    if (IsKeyDown(_controls.move[LEFT]))    _scene._player.pos.x -= _scene._move_speed;
+    if (IsKeyDown(_controls.move[RIGHT]))   _scene._player.pos.x += _scene._move_speed;
+    if (IsKeyDown(_controls.move[UP]))      _scene._player.pos.y -= _scene._move_speed;
+    if (IsKeyDown(_controls.move[DOWN]))    _scene._player.pos.y += _scene._move_speed;
 }
 
 void Game::handle_collision() {

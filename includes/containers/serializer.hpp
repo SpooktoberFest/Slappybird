@@ -10,7 +10,6 @@
 #include "properties.hpp"
 // #include "entities.hpp"
 
-
 class Serializer {
 public:
     Serializer() {};
@@ -21,6 +20,9 @@ public:
 
     bool saveProfile(std::string name, Profile* profile_opt=nullptr);
     bool loadProfile(std::string name, Profile* profile_opt=nullptr);
+
+    bool saveMenu(std::string name, Menu* menu_opt=nullptr);
+    bool loadMenu(std::string name, Menu* menu_opt=nullptr);
 
     bool devModeLoad(std::string path);
 
@@ -35,9 +37,20 @@ private:
 
     bool saveSceneToDB(const std::string& name, const Scene& scene, bool custom);
 
+    inline void get_maybe_f(const nlohmann::json& json_data, float& write_to, const std::string field_name) {
+        if (json_data.count(field_name)) { write_to = json_data[field_name].get<float>(); }
+    };
+    inline void get_maybe_vec2(const nlohmann::json& json_data, Vec2& write_to, const std::string field_name) {
+        if (json_data.count(field_name)) {
+            std::vector<float> tmp = json_data[field_name].get<std::vector<float>>();
+            write_to = {tmp[0]*BLOCK, tmp[1]*BLOCK};
+        }
+    };
+
 
     Scene loaded_scene;
     Profile loaded_profile;
+    Menu loaded_menu;
     const static std::string cannon_scenes_path;
     const static std::string custom_scenes_path;
     const static std::string profiles_path;

@@ -13,6 +13,7 @@ int main(int argc, char** argv) {
             Game game;
             game.load_scene(&scene_1);
 
+
             while (!WindowShouldClose()) {
                 game.simulate();
                 game.render();

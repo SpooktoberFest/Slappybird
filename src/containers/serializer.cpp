@@ -8,13 +8,12 @@
 
 #include "debug.hpp"
 
+using json = nlohmann::json;
 
 const static auto src = "Serializer";
 
-using json = nlohmann::json;
-
-const std::string Serializer::cannon_scenes_path = "resources/cannon_scenes/";
-const std::string Serializer::custom_scenes_path = "resources/custom_scenes/";
+const std::string Serializer::cannon_scenes_path = "resources/scenes/";
+const std::string Serializer::custom_scenes_path = "resources/scenes/";
 const std::string Serializer::profiles_path = "resources/profiles/";
 
 
@@ -74,6 +73,31 @@ bool Serializer::loadProfile(std::string name, Profile* profile_opt) {
     }
 }
 
+bool Serializer::loadMenu(std::string name, Menu* menu_opt) {
+    try {
+        std::ifstream is(cannon_scenes_path + name, std::ios::binary);
+        if (!is) return false;
+        cereal::BinaryInputArchive archive(is);
+        archive(menu_opt ? *menu_opt : loaded_menu);
+        return true;
+    } catch (const std::exception& e) {
+        LOG_ERROR(src, "Failed to deserialize menu: " + std::string(e.what()));
+        return false;
+    }
+}
+bool Serializer::saveMenu(std::string name, Menu* menu_opt) {
+    try {
+        std::ofstream os(cannon_scenes_path + name, std::ios::binary);
+        if (!os) return false;
+        cereal::BinaryOutputArchive archive(os);
+        archive(menu_opt ? *menu_opt : loaded_menu);
+        return true;
+    } catch (const std::exception& e) {
+        LOG_ERROR(src, "Failed to serialize menu: " + std::string(e.what()));
+        return false;
+    }
+}
+
 bool Serializer::devModeLoad(std::string path) {
     LOG_INFO(src, "Translating JSON data...");
     json data;
@@ -90,119 +114,118 @@ bool Serializer::devModeLoad(std::string path) {
         return false;
     }
 
-    try {
-        int failures = 0;
-        int total = 0;
+    int failures = 0;
+    int total = 0;
 
-        // Cannon scenes
-        if (data.contains("cannon_scenes")) {
-            for (const auto& scene_json : data["cannon_scenes"]) {
-                ++total;
-                std::string name = scene_json["name"];
-                auto scene_opt = from_json(scene_json["data"]);
-                if (scene_opt) saveScene(name, false, &(*scene_opt));
-                else ++failures;
-            }
+    // Scenes
+    if (data.contains("scenes")) {
+        for (const auto& j : data["scenes"]) {
+            ++total;
+            std::string name = j["name"];
+            auto scene_opt = from_json(j["data"]);
+            if (scene_opt) saveScene(name, true, &(*scene_opt));
+            else ++failures;
         }
-
-        // Custom scenes
-        if (data.contains("custom_scenes")) {
-            for (const auto& scene_json : data["custom_scenes"]) {
-                ++total;
-                std::string name = scene_json["name"];
-                auto scene_opt = from_json(scene_json["data"]);
-                if (scene_opt) saveScene(name, true, &(*scene_opt));
-                else ++failures;
-            }
-        }
-
-        // Profiles
-        if (data.contains("profiles")) {
-            for (const auto& profile_json : data["profiles"]) {
-                ++total;
-                try {
-                    std::string name = profile_json["name"];
-                    const auto& profile_data = profile_json["data"];
-                    Profile profile;
-                    profile.equipment = unlock_map<Equipment>(profile_data.value("_sets", std::vector<u_int16_t>()));
-                    profile.moves = unlock_map<Technique>(profile_data.value("_movesets", std::vector<u_int16_t>()));
-                    saveProfile(name, &profile);
-                } catch (const std::exception& e) {
-                    LOG_ERROR(src, "Failed to parse profile: " + std::string(e.what()));
-                    ++failures;
-                }
-            }
-        }
-
-        LOG_INFO(src, "Finished translating: " + std::to_string(failures) + " failures out of " + std::to_string(total));
-        return failures == 0;
-
-    } catch (const std::exception& e) {
-        LOG_ERROR(src, "Unexpected exception during processing: " + std::string(e.what()));
-        return false;
     }
+
+    // Menus
+    if (data.contains("menus")) {
+        for (const auto& j : data["menus"]) {
+            ++total;
+            Menu menu;
+            try {
+                // Menu Buttons
+                for (const auto& b : j["data"]["_buttons"]) {
+                    Button button;
+                    get_maybe_vec2(b, button.pos, "pos");
+                    get_maybe_vec2(b, button.size, "size");
+                    button.action = b["action"].get<Action>();
+                    button.text = b["text"].get<std::string>();
+                    menu._buttons.push_back(std::move(button));
+                }
+            saveMenu(j["name"], &menu);
+            } catch (const std::exception& e) {
+                LOG_ERROR(src, "Failed to parse menu: " + std::string(e.what()));
+                ++failures;
+            }
+        }
+    }
+
+    // Profiles
+    if (data.contains("profiles")) {
+        for (const auto& j : data["profiles"]) {
+            ++total;
+            try {
+                Profile profile{
+                    unlock_map<Equipment>(j["data"].value("equipment", std::vector<u_int16_t>())),
+                    unlock_map<Technique>(j["data"].value("moves", std::vector<u_int16_t>()))
+                };
+                saveProfile(j["name"], &profile);
+            } catch (const std::exception& e) {
+                LOG_ERROR(src, "Failed to parse profile: " + std::string(e.what()));
+                ++failures;
+            }
+        }
+    }
+
+    LOG_INFO(src, "Finished translating: " + std::to_string(failures) + " failures out of " + std::to_string(total));
+    return failures == 0;
+
 }
 
 std::optional<Scene> Serializer::from_json(const json& json_data) {
     Scene scene;
-    std::vector<float> tmp;
     std::string breakpoint;
-
-    const auto get_f = [&json_data](float& target, std::string name)
-        { if (json_data.count(name)) { target = json_data[name].get<float>(); } };
-    const auto get_vec2 = [&tmp](const json& json_data, Vec2& target, std::string name)
-        { if (json_data.count(name)) { tmp = json_data[name].get<std::vector<float>>(); target = {tmp[0]*BLOCK, tmp[1]*BLOCK};} };
-
 
     try {
         breakpoint = "_player";
         if (json_data.count("_player")) {
             auto& in = json_data["_player"];
-            get_vec2(in, scene._player.pos, "pos");
-            get_vec2(in, scene._player.vel, "vel");
+            get_maybe_vec2(in, scene._player.pos, "pos");
+            get_maybe_vec2(in, scene._player.vel, "vel");
         };
         breakpoint = "_pipes";
         if (json_data.count("_pipes")) {
             Pipe pipe;
-            for (const auto& json_elem : json_data["_pipes"]) {
-                get_vec2(json_elem, pipe.pos, "pos");
+            for (const auto& j : json_data["_pipes"]) {
+                get_maybe_vec2(j, pipe.pos, "pos");
                 scene._pipes.push_back(std::move(pipe));
             }
         };
         breakpoint = "_buttons";
         if (json_data.count("_buttons")) {
             Button button;
-            for (const auto& json_elem : json_data["_buttons"]) {
-                get_vec2(json_elem, button.pos, "pos");
-                get_vec2(json_elem, button.size, "size");
-                button.action = json_elem["action"].get<Action>();
-                button.text = json_elem["text"].get<std::string>();
+            for (const auto& j : json_data["_buttons"]) {
+                get_maybe_vec2(j, button.pos, "pos");
+                get_maybe_vec2(j, button.size, "size");
+                button.action = j["action"].get<Action>();
+                button.text = j["text"].get<std::string>();
                 scene._buttons.push_back(std::move(button));
             }
         };
         breakpoint = "_platforms";
         if (json_data.count("_platforms")) {
             Platform platform;
-            for (const auto& json_elem : json_data["_pipes"]) {
-                get_vec2(json_elem, platform.pos, "pos");
-                get_vec2(json_elem, platform.size, "size");
+            for (const auto& j : json_data["_pipes"]) {
+                get_maybe_vec2(j, platform.pos, "pos");
+                get_maybe_vec2(j, platform.size, "size");
                 scene._platforms.push_back(std::move(platform));
             }
         };
 
         breakpoint = "floats";
-        get_f(scene._pipe_width, "_pipe_width");
-        get_f(scene._gap_height, "_gap_height");
-        get_f(scene._gravity, "_gravity");
-        get_f(scene._jump_strength, "_jump_strength");
-        get_f(scene._pipe_speed, "_pipe_speed");
-        get_f(scene._move_speed, "_move_speed");
+        get_maybe_f(json_data, scene._pipe_width, "_pipe_width");
+        get_maybe_f(json_data, scene._gap_height, "_gap_height");
+        get_maybe_f(json_data, scene._gravity, "_gravity");
+        get_maybe_f(json_data, scene._jump_strength, "_jump_strength");
+        get_maybe_f(json_data, scene._pipe_speed, "_pipe_speed");
+        get_maybe_f(json_data, scene._move_speed, "_move_speed");
 
         breakpoint = "_score";
         scene._score = json_data.value("_score", 0);
         breakpoint = "camera";
-        get_vec2(json_data, scene._cam_vel, "_cam_vel");
-        get_vec2(json_data, scene._cam_pos, "_cam_pos");
+        get_maybe_vec2(json_data, scene._cam_vel, "_cam_vel");
+        get_maybe_vec2(json_data, scene._cam_pos, "_cam_pos");
 
         return scene;
     } catch (const std::exception& e) {

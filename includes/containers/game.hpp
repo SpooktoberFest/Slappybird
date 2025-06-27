@@ -4,6 +4,7 @@
 #include <vector>
 #include <optional>
 #include <array>
+#include <stack>
 
 #include "entities.hpp"
 #include "scene.hpp"
@@ -27,7 +28,6 @@ public:
     void render();
     void load_scene(const Scene* const scene);
 
-
     Serializer _serializer;
 
 private:
@@ -40,7 +40,7 @@ private:
 
     // Game State
     Scene _scene;
-    std::vector<Button> _menu_buttons;
+    std::stack<Menu> _menus;
     const Scene* _scene_template;
     GameState _gamestate = GameState::INIT;
 
