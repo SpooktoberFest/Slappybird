@@ -3,15 +3,18 @@
 # To do:
 
 Now:
-- Pause Menus
-- Level Select
+- Spawners
+
+- Create Basic Scenes
+- Create Menus
 
 
 ----
 
 
 Soon:
-- Spawners
+- Basic Enemies
+- Biomes
 - Basic Attack
 
 
@@ -22,19 +25,37 @@ Later:
 - Database
 - Advanced Level Creator
 - Other Levels
-- Basic Enemies
 - Attack Speed
 - Boost Panels
 - Toggleable Blocks
-- Profiles
 - Expand Moveset
 - Equipment
 - More Enemies
+- Enemy AI
+- Textures
 
 
 # Memo:
 
 ```
+
+
+
+Things that should be able to make Spawners spawn:
+- Public member method
+- Time period
+- Buttons
+- Scene load
+- Within frame
+
+Things the Spawners need to be able to read when spawning:
+- Scenes names
+- Profiles names
+
+Things the Spawners need to be able to spawn:
+- Any Entities (through constructor)
+
+
 
 
 ```

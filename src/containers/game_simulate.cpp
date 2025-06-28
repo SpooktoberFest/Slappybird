@@ -53,7 +53,7 @@ void Game::handle_input() {
     */
 
     if (IsKeyPressed(_controls.reset)) {
-        _scene = *_scene_template;
+        reset_scene();
         _gamestate = GameState::RUNNING;
     }
     if (IsKeyPressed(_controls.pause)) {
@@ -86,7 +86,7 @@ void Game::handle_input() {
         // Mouse hover
         Vector2 mouse_pos = GetMousePosition();
         for (short i = 0; i < buttons.size(); ++i) {
-            if (CheckCollisionPointRec(mouse_pos, buttons[i].rect())) {
+            if (CheckCollisionPointRec(mouse_pos, buttons[i].rect(_res))) {
                 index = i;
                 // Mouse click
                 if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
@@ -104,10 +104,17 @@ void Game::handle_input() {
 
     // Move player
     if (IsKeyPressed(_controls.jump))       _scene._player.vel.y = _scene._jump_strength;
-    if (IsKeyDown(_controls.move[LEFT]))    _scene._player.pos.x -= _scene._move_speed;
-    if (IsKeyDown(_controls.move[RIGHT]))   _scene._player.pos.x += _scene._move_speed;
-    if (IsKeyDown(_controls.move[UP]))      _scene._player.pos.y -= _scene._move_speed;
-    if (IsKeyDown(_controls.move[DOWN]))    _scene._player.pos.y += _scene._move_speed;
+    const Vec2 vel = {
+        (IsKeyDown(_controls.move[RIGHT]) - IsKeyDown(_controls.move[LEFT])) * _scene._move_speed,
+        (IsKeyDown(_controls.move[DOWN]) - IsKeyDown(_controls.move[UP])) * _scene._move_speed
+    };
+    if (vel.x && vel.y) {
+        _scene._player.pos.x += vel.x * 0.75;
+        _scene._player.pos.y += vel.y * 0.75;
+    } else {
+        _scene._player.pos.x += vel.x;
+        _scene._player.pos.y += vel.y;
+    }
 }
 
 void Game::handle_collision() {

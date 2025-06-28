@@ -26,7 +26,7 @@ public:
 
     void simulate();
     void render();
-    void load_scene(const Scene* const scene);
+    void reset_scene(const Scene* scene=nullptr);
 
     Serializer _serializer;
 
@@ -41,11 +41,10 @@ private:
     // Game State
     Scene _scene;
     std::stack<Menu> _menus;
-    const Scene* _scene_template;
     GameState _gamestate = GameState::INIT;
 
     // Window Properties
-    Vector2 _res = {800, 450}; // Window resolution
+    Vector2 _res = {800, 480}; // Window resolution {25_b, 15_b}
 
     // Misc
     Shader _gradient_shader;

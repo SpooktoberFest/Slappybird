@@ -9,9 +9,15 @@ int main(int argc, char** argv) {
     {
         srand(time(0));
         if (argc == 1) {    // Run game
-            Scene scene_1;
             Game game;
-            game.load_scene(&scene_1);
+
+            game._serializer.loadScene("WIP.scene");
+            game.reset_scene();
+
+            LOG_DEBUG(src, std::to_string(game._serializer.loaded_scene._platforms.size()) + " platforms in scene!");
+            auto& pf = game._serializer.loaded_scene._platforms[0];
+            LOG_DEBUG(src, std::to_string(pf.pos.x)+","+std::to_string(pf.pos.y)+","+std::to_string(pf.size.y)+","+std::to_string(pf.size.y));
+
 
 
             while (!WindowShouldClose()) {

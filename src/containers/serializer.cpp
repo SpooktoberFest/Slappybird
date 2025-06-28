@@ -12,17 +12,13 @@ using json = nlohmann::json;
 
 const static auto src = "Serializer";
 
-const std::string Serializer::cannon_scenes_path = "resources/scenes/";
-const std::string Serializer::custom_scenes_path = "resources/scenes/";
+const std::string Serializer::scenes_path = "resources/scenes/";
 const std::string Serializer::profiles_path = "resources/profiles/";
 
 
-bool Serializer::saveScene(std::string name, bool custom, Scene* scene_opt) {
+bool Serializer::saveScene(std::string name, Scene* scene_opt) {
     try {
-        std::ofstream os(
-            (custom ? custom_scenes_path : cannon_scenes_path) + name,
-            std::ios::binary
-        );
+        std::ofstream os(scenes_path + name, std::ios::binary);
         if (!os) return false;
         cereal::BinaryOutputArchive archive(os);
         archive(scene_opt ? *scene_opt : loaded_scene);
@@ -32,12 +28,9 @@ bool Serializer::saveScene(std::string name, bool custom, Scene* scene_opt) {
         return false;
     }
 }
-bool Serializer::loadScene(std::string name, bool custom, Scene* scene_opt) {
+bool Serializer::loadScene(std::string name, Scene* scene_opt) {
     try {
-        std::ifstream is(
-            custom ? custom_scenes_path : cannon_scenes_path,
-            std::ios::binary
-        );
+        std::ifstream is(scenes_path + name, std::ios::binary);
         if (!is) return false;
         cereal::BinaryInputArchive archive(is);
         archive(scene_opt ? *scene_opt : loaded_scene);
@@ -75,7 +68,7 @@ bool Serializer::loadProfile(std::string name, Profile* profile_opt) {
 
 bool Serializer::loadMenu(std::string name, Menu* menu_opt) {
     try {
-        std::ifstream is(cannon_scenes_path + name, std::ios::binary);
+        std::ifstream is(scenes_path + name, std::ios::binary);
         if (!is) return false;
         cereal::BinaryInputArchive archive(is);
         archive(menu_opt ? *menu_opt : loaded_menu);
@@ -87,7 +80,7 @@ bool Serializer::loadMenu(std::string name, Menu* menu_opt) {
 }
 bool Serializer::saveMenu(std::string name, Menu* menu_opt) {
     try {
-        std::ofstream os(cannon_scenes_path + name, std::ios::binary);
+        std::ofstream os(scenes_path + name, std::ios::binary);
         if (!os) return false;
         cereal::BinaryOutputArchive archive(os);
         archive(menu_opt ? *menu_opt : loaded_menu);
@@ -123,7 +116,7 @@ bool Serializer::devModeLoad(std::string path) {
             ++total;
             std::string name = j["name"];
             auto scene_opt = from_json(j["data"]);
-            if (scene_opt) saveScene(name, true, &(*scene_opt));
+            if (scene_opt) saveScene(name, &(*scene_opt));
             else ++failures;
         }
     }
@@ -140,6 +133,7 @@ bool Serializer::devModeLoad(std::string path) {
                     get_maybe_vec2(b, button.pos, "pos");
                     get_maybe_vec2(b, button.size, "size");
                     button.action = b["action"].get<Action>();
+                    button.parameter = b.value("parameter", 0);
                     button.text = b["text"].get<std::string>();
                     menu._buttons.push_back(std::move(button));
                 }
@@ -199,6 +193,7 @@ std::optional<Scene> Serializer::from_json(const json& json_data) {
                 get_maybe_vec2(j, button.pos, "pos");
                 get_maybe_vec2(j, button.size, "size");
                 button.action = j["action"].get<Action>();
+                button.parameter = j.value("parameter", 0);
                 button.text = j["text"].get<std::string>();
                 scene._buttons.push_back(std::move(button));
             }
@@ -206,7 +201,7 @@ std::optional<Scene> Serializer::from_json(const json& json_data) {
         breakpoint = "_platforms";
         if (json_data.count("_platforms")) {
             Platform platform;
-            for (const auto& j : json_data["_pipes"]) {
+            for (const auto& j : json_data["_platforms"]) {
                 get_maybe_vec2(j, platform.pos, "pos");
                 get_maybe_vec2(j, platform.size, "size");
                 scene._platforms.push_back(std::move(platform));
@@ -224,8 +219,9 @@ std::optional<Scene> Serializer::from_json(const json& json_data) {
         breakpoint = "_score";
         scene._score = json_data.value("_score", 0);
         breakpoint = "camera";
-        get_maybe_vec2(json_data, scene._cam_vel, "_cam_vel");
         get_maybe_vec2(json_data, scene._cam_pos, "_cam_pos");
+        scene._cam_vel.x = json_data.value("_cam_vel_x", QNAN);
+        scene._cam_vel.y = json_data.value("_cam_vel_y", QNAN);
 
         return scene;
     } catch (const std::exception& e) {

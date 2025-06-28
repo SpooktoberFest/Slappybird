@@ -4,8 +4,10 @@
       "name": "pause.menu",
       "data": {
             "_buttons": [
-              { "pos": [20, 12], "size": [5, 2], "text": "Button 1", "action": 1 },
-              { "pos": [20, 7], "size": [5, 2], "text": "Button 2", "action": 2 }
+              { "pos": [-7, 2], "size": [6, 1.5], "text": "Button 1", "action": 1 },
+              { "pos": [-7, 4], "size": [6, 1.5], "text": "Button 2", "action": 2 },
+              { "pos": [-7, 6], "size": [6, 1.5], "text": "Button 3", "action": 3 },
+              { "pos": [-7, 8], "size": [6, 1.5], "text": "Button 4", "action": 4 }
             ]
         }
     }
@@ -15,7 +17,7 @@
       "name": "template.scene",
       "data": {
             "_player": {
-                "pos": [100, 100],
+                "pos": [0, 0],
                 "vel": [0, 0]
             },
             "_pipes": [
@@ -37,8 +39,63 @@
             "_jump_strength": -8.0,
 
             "_score": 0,
-            "_cam_vel": [0, 0],
-            "_cam_pos": [100, 100]
+            "_cam_pos": [0, 0],
+            "_cam_vel_x": 0,
+            "_cam_vel_y": 0
+        }
+    },
+    {
+      "name": "main_menu.scene",
+      "data": {
+            "_player": {
+                "pos": [0, 0],
+                "vel": [0, -5]
+            },
+            "_platforms": [
+              { "pos": [0, 14], "size": [25, 1] }
+            ],
+            "_buttons": [
+              { "pos": [-7, 2], "size": [6, 1.5], "text": "Load Profile", "action": 16384 },
+              { "pos": [-7, 4], "size": [6, 1.5], "text": "Create Profile", "action": 16385 },
+              { "pos": [-7, 6], "size": [6, 1.5], "text": "Button 3", "action": 3 },
+              { "pos": [-7, 8], "size": [6, 1.5], "text": "Button 4", "action": 4 }
+            ],
+
+            "_pipe_width": 64.0,
+            "_gap_height": 150.0,
+            "_pipe_speed": 3.0,
+
+            "_move_speed": 5.0,
+            "_gravity": 0.5,
+            "_jump_strength": -8.0,
+
+            "_score": 0,
+            "_cam_pos": [0, 0],
+            "_cam_vel_y": 0
+        }
+    },
+    {
+      "name": "WIP.scene",
+      "data": {
+            "_player": {
+                "pos": [5, 5],
+                "vel": [0, -5]
+            },
+            "_platforms": [
+              { "pos": [5, 14], "size": [1, 1] }
+            ],
+
+            "_pipe_width": 64.0,
+            "_gap_height": 150.0,
+            "_pipe_speed": 3.0,
+
+            "_move_speed": 5.0,
+            "_gravity": 0.5,
+            "_jump_strength": -8.0,
+
+            "_score": 0,
+            "_cam_pos": [0, 0],
+            "_cam_vel_y": 0
         }
     }
   ],

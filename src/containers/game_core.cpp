@@ -8,7 +8,7 @@
 const static auto src = "Game";
 
 Game::Game() {
-    SetConfigFlags(FLAG_WINDOW_RESIZABLE); // FLAG_FULLSCREEN_MODE
+    // SetConfigFlags(FLAG_WINDOW_RESIZABLE); // FLAG_FULLSCREEN_MODE
     InitWindow(_res.x, _res.y, "Super Flappy Kendoka Person!");
     // InitAudioDevice();
     SetTargetFPS(60);
@@ -26,6 +26,8 @@ Game::Game() {
         _serializer.loadMenu("pause.menu", &menu);
         _menus.push(std::move(menu));
     }
+
+    reset_scene();
 
     LOG_INFO(src, "Loaded Resources");
     _gamestate = GameState::RUNNING;
@@ -61,21 +63,22 @@ void Game::render() {
     // Scene Buttons
     const bool is_running = _gamestate == GameState::RUNNING;
     for (const auto& button : _scene._buttons) {
-        DrawRectangleRec(button.rect(), (is_running ? WHITE : GRAY));
+        DrawRectangleRec(button.rect(_res), (is_running ? WHITE : GRAY));
         DrawText(button.text.c_str(), button.pos.x + 5, button.pos.y + 5, 20, DARKGRAY);
     } if (is_running) {
         if (_scene._selected < _scene._buttons.size())
-            DrawRectangleLinesEx(_scene._buttons[_scene._selected].rect(), 5.0f, YELLOW);
+            DrawRectangleLinesEx(_scene._buttons[_scene._selected].rect(_res), 5.0f, YELLOW);
     }
     // Menu Buttons
     else {
         const Menu& menu = _menus.top();
         for (const auto& button : menu._buttons) {
-            DrawRectangleRec(button.rect(), WHITE);
-            DrawText(button.text.c_str(), button.pos.x + 5, button.pos.y + 5, 20, DARKGRAY);
+            const auto hitbox = button.rect(_res);
+            DrawRectangleRec(hitbox, WHITE);
+            DrawText(button.text.c_str(), hitbox.x + 5, hitbox.y + 5, 20, DARKGRAY);
         }
         if (menu._selected < menu._buttons.size())
-            DrawRectangleLinesEx(menu._buttons[menu._selected].rect(), 5.0f, YELLOW);
+            DrawRectangleLinesEx(menu._buttons[menu._selected].rect(_res), 5.0f, YELLOW);
     }
 
     // Player
@@ -121,8 +124,8 @@ void Game::set_background(OptColor color1, OptColor color2) {
     }
 }
 
-void Game::load_scene(const Scene* const scene) {
-    _scene_template = scene;
-    _scene = *_scene_template;
+void Game::reset_scene(const Scene* scene) {
+    if (scene) _serializer.loaded_scene = *scene;
+    _scene = _serializer.loaded_scene;
 }
 

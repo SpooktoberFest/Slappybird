@@ -3,24 +3,18 @@
 
 #include <limits.h>
 
-enum Action : int16_t {
-    // Load world
-    LOAD_CUSTOM_WORLD = SHRT_MIN,
-    LOAD_CANNON_WORLD = SHRT_MIN*2/3,
-    LOAD_UI = SHRT_MIN/3,
-
+enum Action : u_int8_t {
     // Actions that can be called from any world
-    NORMAL_ACTION = 0,
-    TOGGLE_GROUP_1,
-    TOGGLE_GROUP_2,
-    TOGGLE_GROUP_3,
-    TOGGLE_GROUP_4,
+    NOP,
+    TOGGLE_GROUP,
+    LOAD_WORLD,
+    LOAD_MENU,
 
     // Actions that cannot be called from custom worlds
-    SPECIAL_ACTION = SHRT_MAX/2,
-    NEW_SAVE,
-    LOAD_SAVE,
-    DELETE_SAVE,
+    SPECIAL_ACTION = CHAR_MAX/2,
+    LOAD_PROFILE,
+    NEW_PROFILE,
+    DELETE_PROFILE,
 };
 
 enum Diretion : int8_t { UP, DOWN, LEFT, RIGHT };
@@ -40,6 +34,14 @@ enum class Equipment : u_int16_t {
 enum class Technique : u_int16_t {
     NONE,
     MEN, DO, KOTE
+};
+
+enum class Entity : u_int8_t {
+    CHARACTER,
+    PIPE,
+    PLATFORM,
+    BUTTON,
+    SPAWNER
 };
 
 

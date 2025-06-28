@@ -34,7 +34,7 @@ struct Pipe {
 
 struct Platform {
     Vec2 pos;
-    Vec2 size;
+    Vec2 size {1_b, 1_b};
 
     constexpr Rectangle rect() const
         { return Rectangle{pos.x, pos.y, size.x, size.y}; };
@@ -48,16 +48,28 @@ struct Button {
     Vec2 size;
     std::string text;
     Action action;
+    int parameter;
 
-    constexpr Rectangle rect() const
-        { return Rectangle{pos.x, pos.y, size.x, size.y}; };    
+    constexpr Rectangle rect(const Vector2& res) const {
+        return Rectangle{
+            (pos.x < 0.0f ? res.x + pos.x : pos.x),
+            (pos.y < 0.0f ? res.y + pos.y : pos.y),
+            size.x, size.y};
+        };
 
     template <class Archive>
-    void serialize(Archive& ar) { ar(pos, size, text, action); }
+    void serialize(Archive& ar) { ar(pos, size, text, action, parameter); }
 };
 
+struct Spawner {
+    Vec2 pos;
+    Vec2 vel;
 
 
+
+    template <class Archive>
+    void serialize(Archive& ar) { ar(vel, pos); }
+};
 
 
 #endif // SUPERFLAPPY_ENTITIES_HPP
