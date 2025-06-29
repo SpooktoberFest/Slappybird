@@ -25,11 +25,15 @@ public:
     bool loadMenu(std::string name, Menu* menu_opt=nullptr);
 
     bool devModeLoad(std::string path);
+    std::vector<std::string> get_files(const int start_index, const std::string& path, std::string type);
 
 
     Scene loaded_scene;
     Profile loaded_profile;
     Menu loaded_menu;
+
+    const static std::string scenes_path;
+    const static std::string profiles_path;
 
 private:
 
@@ -41,9 +45,6 @@ private:
     // void send_profile(const std::string& name);
     // bool saveSceneToDB(const std::string& name, const Scene& scene, bool custom);
 
-    inline void get_maybe_f(const nlohmann::json& json_data, float& write_to, const std::string field_name) {
-        if (json_data.count(field_name)) { write_to = json_data[field_name].get<float>(); }
-    };
     inline void get_maybe_vec2(const nlohmann::json& json_data, Vec2& write_to, const std::string field_name) {
         if (json_data.count(field_name)) {
             std::vector<float> tmp = json_data[field_name].get<std::vector<float>>();
@@ -52,8 +53,6 @@ private:
     };
 
 
-    const static std::string scenes_path;
-    const static std::string profiles_path;
 };
 
 

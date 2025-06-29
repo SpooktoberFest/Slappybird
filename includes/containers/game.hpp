@@ -27,6 +27,7 @@ public:
     void simulate();
     void render();
     void reset_scene(const Scene* scene=nullptr);
+    bool is_quit() const;
 
     Serializer _serializer;
 
@@ -34,6 +35,7 @@ private:
 
     void handle_collision();
     void handle_input();
+    void handle_spawning();
     void handle_action(const Action& action);
     void set_background(OptColor color1, OptColor color2);
     void update_resolution(const bool override=false);

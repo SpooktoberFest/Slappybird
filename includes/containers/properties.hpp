@@ -3,6 +3,7 @@
 
 #include <array>
 #include <vector>
+#include <chrono>
 
 #include "raylib.h"
 #include <cereal/types/array.hpp>
@@ -10,6 +11,7 @@
 #include "unlock_map.hpp"
 #include "enums.hpp"
 
+#define QNAN std::numeric_limits<float>::quiet_NaN()
 #define BLOCK 32.0f
 
 // Literal for block unit
@@ -60,6 +62,11 @@ struct Profile {
 
     template <class Archive>
     void serialize(Archive& ar) { ar(equipment, moves); };
+};
+
+struct Context {
+    Action action;
+    // std::chrono:: t;
 };
 
 

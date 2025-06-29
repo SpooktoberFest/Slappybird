@@ -7,11 +7,13 @@ enum Action : u_int8_t {
     // Actions that can be called from any world
     NOP,
     TOGGLE_GROUP,
+    RESET_WORLD,
     LOAD_WORLD,
     LOAD_MENU,
 
     // Actions that cannot be called from custom worlds
-    SPECIAL_ACTION = CHAR_MAX/2,
+    SPECIAL_ACTION = UCHAR_MAX/2,
+    EXIT_GAME,
     LOAD_PROFILE,
     NEW_PROFILE,
     DELETE_PROFILE,
@@ -37,7 +39,8 @@ enum class Technique : u_int16_t {
 };
 
 enum class Entity : u_int8_t {
-    CHARACTER,
+    PLAYER,
+    ENEMY,
     PIPE,
     PLATFORM,
     BUTTON,

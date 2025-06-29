@@ -15,10 +15,12 @@ void Game::simulate() {
 
     // Update Bird
     {
-        Chararacter& p = _scene._player;
-        p.vel.y += _scene._gravity;
-        p.pos.x += p.vel.x;
-        p.pos.y += p.vel.y;
+        Chararacter& p = *_scene._world.player;
+        p.vel.y += _scene._world.biomes[0].gravity;
+        p.pos.x += std::min(p.vel.x, 1_b);
+        p.pos.y += std::min(p.vel.y, 1_b);
+        // p.pos.x += p.vel.x;
+        // p.pos.y += p.vel.y;
     }
 
 
@@ -26,18 +28,90 @@ void Game::simulate() {
     
     // Update Camera
     {
+        Chararacter& p = *_scene._world.player;
         const Vec2& cam_vel = _scene._cam_vel;
         Vec2& cam_pos = _scene._cam_pos;
         if (std::isnan(cam_vel.x))
-            cam_pos.x = _scene._player.pos.x - (_res.x / 2);
+            cam_pos.x = p.pos.x - (_res.x / 2);
         else cam_pos.x += cam_vel.x;
         if (std::isnan(cam_vel.y))
-            cam_pos.y = _scene._player.pos.y - (_res.y / 2);
+            cam_pos.y = p.pos.y - (_res.y / 2);
         else cam_pos.y += cam_vel.y;
     }
 
+    handle_spawning();
+
     handle_collision();
 };
+
+
+void Game::handle_spawning() {
+    Chararacter& p1 = *_scene._world.player;
+    const Rectangle p1_rect = p1.rect(1_b, 2_b);
+    Biome& b = _scene._world.biomes[0];
+
+    // Check player-border collisions
+    if (!CheckCollisionRecs(
+        p1_rect, {_scene._cam_pos.x, _scene._cam_pos.y, _res.x, _res.y}
+    )) {
+        _gamestate = GameState::GAMEOVER;
+    }
+
+    // Check player-platforms collisions
+    for (const auto& pf : _scene._world.platforms) {
+        if (CheckCollisionRecs(p1_rect, pf.rect())) {
+            float arr[4] = {
+                pf.pos.x + pf.size.x - p1.pos.x,
+                p1.pos.x + p1_rect.width - pf.pos.x,
+                pf.pos.y + pf.size.y - p1.pos.y,
+                p1.pos.y + p1_rect.height - pf.pos.y,
+            };
+
+            int index = 0;
+            for (int i = 1; i < 4; ++i) {
+                if (arr[i] < arr[index]) {
+                    index = i;
+                }
+            }
+
+            switch (index) {
+                case 0: p1.pos.x += arr[index]; p1.vel.x = 0; break;
+                case 1: p1.pos.x -= arr[index]; p1.vel.x = 0; break;
+                case 2: p1.pos.y += arr[index]; p1.vel.y = 0; break;
+                case 3: p1.pos.y -= arr[index]; p1.vel.y = 0; break;
+            }
+        }
+    }
+
+    // Update pipes
+    for (int i = 0; i < _scene._world.pipes.size(); i++) {
+        Pipe& pipe = _scene._world.pipes[i];
+
+        // Reset when the left of screen
+        if (pipe.pos.x < _scene._cam_pos.x - b.pipe_width) {
+            pipe.pos.x = _res.x + 250 + _scene._cam_pos.x;
+            pipe.pos.y = 100 + rand() % 200;
+            pipe.passed = false;
+        }
+
+        // Check player-pipe collisions
+        auto hboxes = pipe.rect(b.pipe_width, b.gap_height);
+        if (CheckCollisionRecs(p1_rect, hboxes[0]) ||
+            CheckCollisionRecs(p1_rect, hboxes[1])) {
+            _gamestate = GameState::GAMEOVER;
+        }
+
+        // Scoring
+        if (!pipe.passed &&
+            pipe.pos.x + b.pipe_width < p1.pos.x &&
+            p1.pos.y > hboxes[0].y &&
+            p1.pos.y < hboxes[1].y
+        ) {
+            pipe.passed = true;
+            _scene._score++;
+        }
+    }
+}
 
 void Game::handle_input() {
     /*
@@ -71,10 +145,10 @@ void Game::handle_input() {
     }
 
     // Mouse & Buttons
-    if (_scene._buttons.size() > 0 || _gamestate == GameState::PAUSED) {
+    if (_scene._world.buttons.size() > 0 || _gamestate == GameState::PAUSED) {
         const bool paused = bool(_gamestate == GameState::PAUSED);
         auto& index =   paused ? _menus.top()._selected : _scene._selected;
-        auto& buttons = paused ? _menus.top()._buttons : _scene._buttons;
+        auto& buttons = paused ? _menus.top()._buttons : _scene._world.buttons;
 
         // Navigation keys
         if (IsKeyPressed(_controls.nav[LEFT]))  index += 8;
@@ -103,22 +177,25 @@ void Game::handle_input() {
     if (_gamestate > GameState::RUNNING) return;
 
     // Move player
-    if (IsKeyPressed(_controls.jump))       _scene._player.vel.y = _scene._jump_strength;
+    Chararacter& p1 = *_scene._world.player;
+    Biome& b = _scene._world.biomes[0];
+    if (IsKeyPressed(_controls.jump)) p1.vel.y = b.jump_strength;
     const Vec2 vel = {
-        (IsKeyDown(_controls.move[RIGHT]) - IsKeyDown(_controls.move[LEFT])) * _scene._move_speed,
-        (IsKeyDown(_controls.move[DOWN]) - IsKeyDown(_controls.move[UP])) * _scene._move_speed
+        (IsKeyDown(_controls.move[RIGHT]) - IsKeyDown(_controls.move[LEFT])) * b.move_speed,
+        (IsKeyDown(_controls.move[DOWN]) - IsKeyDown(_controls.move[UP])) * b.move_speed
     };
     if (vel.x && vel.y) {
-        _scene._player.pos.x += vel.x * 0.75;
-        _scene._player.pos.y += vel.y * 0.75;
+        p1.pos.x += vel.x * 0.75;
+        p1.pos.y += vel.y * 0.75;
     } else {
-        _scene._player.pos.x += vel.x;
-        _scene._player.pos.y += vel.y;
+        p1.pos.x += vel.x;
+        p1.pos.y += vel.y;
     }
 }
 
 void Game::handle_collision() {
-    Chararacter& p1 = _scene._player;
+    Chararacter& p1 = *_scene._world.player;
+    Biome& b = _scene._world.biomes[0];
     const Rectangle p1_rect = p1.rect(1_b, 2_b);
 
     // Check player-border collisions
@@ -129,7 +206,7 @@ void Game::handle_collision() {
     }
 
     // Check player-platforms collisions
-    for (const auto& pf : _scene._platforms) {
+    for (const auto& pf : _scene._world.platforms) {
         if (CheckCollisionRecs(p1_rect, pf.rect())) {
             float arr[4] = {
                 pf.pos.x + pf.size.x - p1.pos.x,
@@ -155,18 +232,18 @@ void Game::handle_collision() {
     }
 
     // Update pipes
-    for (int i = 0; i < _scene._pipes.size(); i++) {
-        Pipe& pipe = _scene._pipes[i];
+    for (int i = 0; i < _scene._world.pipes.size(); i++) {
+        Pipe& pipe = _scene._world.pipes[i];
 
         // Reset when the left of screen
-        if (pipe.pos.x < _scene._cam_pos.x - _scene._pipe_width) {
+        if (pipe.pos.x < _scene._cam_pos.x - b.pipe_width) {
             pipe.pos.x = _res.x + 250 + _scene._cam_pos.x;
             pipe.pos.y = 100 + rand() % 200;
             pipe.passed = false;
         }
 
         // Check player-pipe collisions
-        auto hboxes = pipe.rect(_scene._pipe_width, _scene._gap_height);
+        auto hboxes = pipe.rect(b.pipe_width, b.gap_height);
         if (CheckCollisionRecs(p1_rect, hboxes[0]) ||
             CheckCollisionRecs(p1_rect, hboxes[1])) {
             _gamestate = GameState::GAMEOVER;
@@ -174,7 +251,7 @@ void Game::handle_collision() {
 
         // Scoring
         if (!pipe.passed &&
-            pipe.pos.x + _scene._pipe_width < p1.pos.x &&
+            pipe.pos.x + b.pipe_width < p1.pos.x &&
             p1.pos.y > hboxes[0].y &&
             p1.pos.y < hboxes[1].y
         ) {
@@ -184,27 +261,14 @@ void Game::handle_collision() {
     }
 }
 
-void Game::handle_action(const Action& action) {
-    // Load World Action
-    if (action < NORMAL_ACTION) {
-        int16_t index;
-        if (action < LOAD_CANNON_WORLD) {
-            // Load custom world
-            index = action + LOAD_CUSTOM_WORLD;
-            LOG_INFO(src, "Loading Custom World: " + std::to_string(index));
-            // load_scene();
-        } else {
-            // Load cannon world
-            index = action + LOAD_CANNON_WORLD;
-            LOG_INFO(src, "Loading Cannon World: " + std::to_string(index));
-            // load_scene();
-        }
-        return;
-    }
 
+void Game::handle_action(const Action& action) {
     // Other Actions
     switch (action)
     {
+    case Action::EXIT_GAME:
+        _gamestate = QUIT;
+        break;
     default:
         LOG_WARN(src, "Unknown Action: " + std::to_string(action));
         break;

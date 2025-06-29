@@ -21,12 +21,12 @@ Game::Game() {
 
     LOG_INFO(src, "Initialized Raylib Components");
 
+    _serializer.loadScene("main_menu.scene");
     {
         Menu menu;
         _serializer.loadMenu("pause.menu", &menu);
         _menus.push(std::move(menu));
     }
-
     reset_scene();
 
     LOG_INFO(src, "Loaded Resources");
@@ -48,26 +48,30 @@ void Game::render() {
     DrawRectangle(0, 0, _res.x, _res.y, WHITE);
     EndShaderMode();
 
+    Biome& b = _scene._world.biomes[0];
+
     // Pipes
-    for (const auto& pipe : _scene._pipes) {
-        auto hitboxes = pipe.rect(_scene._pipe_width, _scene._gap_height);
+    for (const auto& pipe : _scene._world.pipes) {
+        auto hitboxes = pipe.rect(b.pipe_width, b.gap_height);
         DrawRectangleRec(std::move(hitboxes[0]) - _scene._cam_pos, GREEN);
         DrawRectangleRec(std::move(hitboxes[1]) - _scene._cam_pos, GREEN);
     }
 
     // Platforms
-    for (const auto& platform : _scene._platforms) {
+    for (const auto& platform : _scene._world.platforms) {
         DrawRectangleRec(platform.rect() - _scene._cam_pos, BROWN);
     }
 
     // Scene Buttons
     const bool is_running = _gamestate == GameState::RUNNING;
-    for (const auto& button : _scene._buttons) {
-        DrawRectangleRec(button.rect(_res), (is_running ? WHITE : GRAY));
-        DrawText(button.text.c_str(), button.pos.x + 5, button.pos.y + 5, 20, DARKGRAY);
-    } if (is_running) {
-        if (_scene._selected < _scene._buttons.size())
-            DrawRectangleLinesEx(_scene._buttons[_scene._selected].rect(_res), 5.0f, YELLOW);
+    for (const auto& button : _scene._world.buttons) {
+            const auto hitbox = button.rect(_res);
+            DrawRectangleRec(hitbox, (is_running ? WHITE : GRAY));
+            DrawText(button.text.c_str(), hitbox.x + 5, hitbox.y + 5, 20, DARKGRAY);
+    }
+    if (is_running) {
+        if (_scene._selected < _scene._world.buttons.size())
+            DrawRectangleLinesEx(_scene._world.buttons[_scene._selected].rect(_res), 5.0f, YELLOW);
     }
     // Menu Buttons
     else {
@@ -82,7 +86,7 @@ void Game::render() {
     }
 
     // Player
-    DrawRectangleRec(_scene._player.rect(1_b, 2_b) - _scene._cam_pos, WHITE);
+    DrawRectangleRec(_scene._world.player->rect(1_b, 2_b) - _scene._cam_pos, WHITE);
 
     // Text
     DrawText(TextFormat("Score: %d", _scene._score), _res.x - 150, 10, 20, BLUE);
@@ -128,4 +132,9 @@ void Game::reset_scene(const Scene* scene) {
     if (scene) _serializer.loaded_scene = *scene;
     _scene = _serializer.loaded_scene;
 }
+
+bool Game::is_quit() const {
+    return _gamestate == GameState::QUIT;
+}
+
 

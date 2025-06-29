@@ -40,19 +40,26 @@ Later:
 ```
 
 
+Spawner needs:
+- 'When' to spawn (member)
+- 'Where' to spawn (member)
+- 'What' to spawn (member)
+- Spawning parameters (derived)
+- Context to parameterize (argument)
+- Method for handling and checking context (Game member)
 
-Things that should be able to make Spawners spawn:
-- Public member method
+'When':
+- Public method
 - Time period
 - Buttons
 - Scene load
 - Within frame
 
-Things the Spawners need to be able to read when spawning:
+Context:
 - Scenes names
 - Profiles names
 
-Things the Spawners need to be able to spawn:
+'What':
 - Any Entities (through constructor)
 
 

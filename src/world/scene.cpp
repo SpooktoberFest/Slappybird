@@ -5,6 +5,8 @@
 const static auto src = "Scene";
 
 Scene::Scene() {
+    _world.player = Chararacter();
+    _world.biomes = {Biome()};
     // const int number_of_pipes = 5;
     // float screen_height_px = 480;
 

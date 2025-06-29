@@ -2,6 +2,9 @@
 
 #include <fstream>
 #include <sstream>
+#include <filesystem>
+#include <vector>
+#include <algorithm>
 
 #include <cereal/archives/binary.hpp>
 // #include <sqlite3.h>
@@ -9,6 +12,7 @@
 #include "debug.hpp"
 
 using json = nlohmann::json;
+namespace fs = std::filesystem;
 
 const static auto src = "Serializer";
 
@@ -128,13 +132,13 @@ bool Serializer::devModeLoad(std::string path) {
             Menu menu;
             try {
                 // Menu Buttons
-                for (const auto& b : j["data"]["_buttons"]) {
+                for (const auto& b : j["data"]["buttons"]) {
                     Button button;
                     get_maybe_vec2(b, button.pos, "pos");
                     get_maybe_vec2(b, button.size, "size");
-                    button.action = b["action"].get<Action>();
+                    button.action = b.value("action", Action::NOP);
                     button.parameter = b.value("parameter", 0);
-                    button.text = b["text"].get<std::string>();
+                    button.text = b.value("text", "");
                     menu._buttons.push_back(std::move(button));
                 }
             saveMenu(j["name"], &menu);
@@ -172,56 +176,61 @@ std::optional<Scene> Serializer::from_json(const json& json_data) {
     std::string breakpoint;
 
     try {
-        breakpoint = "_player";
-        if (json_data.count("_player")) {
-            auto& in = json_data["_player"];
-            get_maybe_vec2(in, scene._player.pos, "pos");
-            get_maybe_vec2(in, scene._player.vel, "vel");
+        breakpoint = "player";
+        if (json_data.count("player")) {
+            auto& in = json_data["player"];
+            get_maybe_vec2(in, scene._world.player->pos, "pos");
+            get_maybe_vec2(in, scene._world.player->vel, "vel");
         };
-        breakpoint = "_pipes";
-        if (json_data.count("_pipes")) {
+        breakpoint = "pipes";
+        if (json_data.count("pipes")) {
             Pipe pipe;
-            for (const auto& j : json_data["_pipes"]) {
+            for (const auto& j : json_data["pipes"]) {
                 get_maybe_vec2(j, pipe.pos, "pos");
-                scene._pipes.push_back(std::move(pipe));
+                scene._world.pipes.push_back(std::move(pipe));
             }
         };
-        breakpoint = "_buttons";
-        if (json_data.count("_buttons")) {
+        breakpoint = "buttons";
+        if (json_data.count("buttons")) {
             Button button;
-            for (const auto& j : json_data["_buttons"]) {
+            for (const auto& j : json_data["buttons"]) {
                 get_maybe_vec2(j, button.pos, "pos");
                 get_maybe_vec2(j, button.size, "size");
-                button.action = j["action"].get<Action>();
+                button.action = j.value("action", Action::NOP);
                 button.parameter = j.value("parameter", 0);
-                button.text = j["text"].get<std::string>();
-                scene._buttons.push_back(std::move(button));
+                button.text = j.value("text", "");
+                scene._world.buttons.push_back(std::move(button));
             }
         };
-        breakpoint = "_platforms";
-        if (json_data.count("_platforms")) {
+        breakpoint = "platforms";
+        if (json_data.count("platforms")) {
             Platform platform;
-            for (const auto& j : json_data["_platforms"]) {
+            for (const auto& j : json_data["platforms"]) {
                 get_maybe_vec2(j, platform.pos, "pos");
                 get_maybe_vec2(j, platform.size, "size");
-                scene._platforms.push_back(std::move(platform));
+                scene._world.platforms.push_back(std::move(platform));
+            }
+        };
+        breakpoint = "biomes";
+        if (json_data.count("biomes")) {
+            Biome biome;
+            for (const auto& j : json_data["biomes"]) {
+                biome.pipe_width = j.value("pipe_width", biome.pipe_width);
+                biome.gap_height = j.value("gap_height", biome.gap_height);
+                biome.gravity = j.value("gravity", biome.gravity);
+                biome.jump_strength = j.value("jump_strength", biome.jump_strength);
+                biome.pipe_speed = j.value("pipe_speed", biome.pipe_speed);
+                biome.move_speed = j.value("move_speed", biome.move_speed);
+                scene._world.biomes.push_back(std::move(biome));
             }
         };
 
-        breakpoint = "floats";
-        get_maybe_f(json_data, scene._pipe_width, "_pipe_width");
-        get_maybe_f(json_data, scene._gap_height, "_gap_height");
-        get_maybe_f(json_data, scene._gravity, "_gravity");
-        get_maybe_f(json_data, scene._jump_strength, "_jump_strength");
-        get_maybe_f(json_data, scene._pipe_speed, "_pipe_speed");
-        get_maybe_f(json_data, scene._move_speed, "_move_speed");
-
-        breakpoint = "_score";
-        scene._score = json_data.value("_score", 0);
+        breakpoint = "score";
+        scene._score = json_data.value("score", 0);
         breakpoint = "camera";
-        get_maybe_vec2(json_data, scene._cam_pos, "_cam_pos");
-        scene._cam_vel.x = json_data.value("_cam_vel_x", QNAN);
-        scene._cam_vel.y = json_data.value("_cam_vel_y", QNAN);
+        get_maybe_vec2(json_data, scene._cam_pos, "cam_pos");
+        scene._cam_vel.x = json_data.value("cam_vel_x", QNAN);
+        scene._cam_vel.y = json_data.value("cam_vel_y", QNAN);
 
         return scene;
     } catch (const std::exception& e) {
@@ -230,95 +239,25 @@ std::optional<Scene> Serializer::from_json(const json& json_data) {
     }
 }
 
+std::vector<std::string> Serializer::get_files(const int start_index, const std::string& path, std::string type) {
+    std::vector<std::string> matched_files;
 
-// std::optional<Scene> Serializer::fetchScene(const std::string& name, bool custom) {
-//     sqlite3* db = nullptr;
-//     if (sqlite3_open((custom ? custom_scenes_path : cannon_scenes_path).c_str(), &db) != SQLITE_OK) {
-//         LOG_ERROR(src, "Cannot open database: " + std::string(sqlite3_errmsg(db)));
-//         return std::nullopt;
-//     }
+    try {
+        if (!fs::exists(path) || !fs::is_directory(path)) {
+            LOG_ERROR(src, "Invalid path: " + path)
+            return matched_files;
+        }
 
-//     const char* query = "SELECT data FROM scenes WHERE name = ?";
-//     sqlite3_stmt* stmt = nullptr;
-//     if (sqlite3_prepare_v2(db, query, -1, &stmt, nullptr) != SQLITE_OK) {
-//         sqlite3_close(db);
-//         LOG_ERROR(src, "Failed to prepare SQL statement");
-//         return std::nullopt;
-//     }
+        for (const auto& entry : fs::directory_iterator(path)) {
+            if (entry.is_regular_file() && entry.path().extension() == type) {
+                matched_files.push_back(entry.path().filename().string());
+            }
+        }
+    } catch (const fs::filesystem_error& e) {
+        LOG_ERROR(src, "Filesystem error: " + std::string(e.what()));
+    }
 
-//     sqlite3_bind_text(stmt, 1, name.c_str(), -1, SQLITE_TRANSIENT);
-
-//     std::optional<Scene> result;
-
-//     if (sqlite3_step(stmt) == SQLITE_ROW) {
-//         const void* blob = sqlite3_column_blob(stmt, 0);
-//         int blob_size = sqlite3_column_bytes(stmt, 0);
-
-//         std::istringstream iss(std::string(reinterpret_cast<const char*>(blob), blob_size));
-//         Scene scene;
-//         try {
-//             cereal::BinaryInputArchive archive(iss);
-//             archive(scene);
-//             result = scene;
-//         } catch (const std::exception& e) {
-//             LOG_ERROR(src, "Deserialization failed: " + std::string(e.what()));
-//         }
-//     } else {
-//         LOG_ERROR(src, "Scene not found: " + name);
-//     }
-
-//     sqlite3_finalize(stmt);
-//     sqlite3_close(db);
-//     return result;
-// }
+    return matched_files;
+}
 
 
-// bool Serializer::saveSceneToDB(const std::string& name, const Scene& scene, bool custom) {
-//     sqlite3* db = nullptr;
-//     const std::string db_path = custom ? custom_scenes_path : cannon_scenes_path;
-
-//     if (sqlite3_open(db_path.c_str(), &db) != SQLITE_OK) {
-//         LOG_ERROR(src, "Cannot open database: " + std::string(sqlite3_errmsg(db)));
-//         return false;
-//     }
-
-//     const char* query = R"(
-//         INSERT INTO scenes (name, data)
-//         VALUES (?, ?)
-//         ON CONFLICT(name) DO UPDATE SET data = excluded.data
-//     )";
-
-//     sqlite3_stmt* stmt = nullptr;
-//     if (sqlite3_prepare_v2(db, query, -1, &stmt, nullptr) != SQLITE_OK) {
-//         LOG_ERROR(src, "Failed to prepare SQL statement: " + std::string(sqlite3_errmsg(db)));
-//         sqlite3_close(db);
-//         return false;
-//     }
-
-//     // Serialize scene to binary blob
-//     std::ostringstream oss(std::ios::binary);
-//     try {
-//         cereal::BinaryOutputArchive archive(oss);
-//         archive(scene);
-//     } catch (const std::exception& e) {
-//         LOG_ERROR(src, "Serialization failed: " + std::string(e.what()));
-//         sqlite3_finalize(stmt);
-//         sqlite3_close(db);
-//         return false;
-//     }
-
-//     std::string blob = oss.str();
-
-//     sqlite3_bind_text(stmt, 1, name.c_str(), -1, SQLITE_TRANSIENT);
-//     sqlite3_bind_blob(stmt, 2, blob.data(), static_cast<int>(blob.size()), SQLITE_TRANSIENT);
-
-//     bool success = true;
-//     if (sqlite3_step(stmt) != SQLITE_DONE) {
-//         LOG_ERROR(src, "Failed to insert or update scene: " + std::string(sqlite3_errmsg(db)));
-//         success = false;
-//     }
-
-//     sqlite3_finalize(stmt);
-//     sqlite3_close(db);
-//     return success;
-// }
