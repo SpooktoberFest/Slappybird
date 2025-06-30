@@ -7,6 +7,7 @@
 
 #include "raylib.h"
 #include <cereal/types/array.hpp>
+#include <nlohmann/json.hpp>
 
 #include "unlock_map.hpp"
 #include "enums.hpp"
@@ -23,7 +24,15 @@ struct Vec2 {
     float x;
     float y;
 
+    Vec2& emplace(const Vec2& other) {
+        if (x == QNAN) x = other.x;
+        if (y == QNAN) y = other.y;
+        return *this;
+    }
     operator Vector2() const { return {x, y}; };
+
+    // (De)Serialization
+    Vec2& load(const nlohmann::json& j, const std::string field, const float def=0);
     template <class Archive>
     void serialize(Archive& ar) { ar(x, y); };
 };
@@ -36,6 +45,8 @@ struct Loadout {
     Equipment weapon;
     std::array<Technique, 4> moveset;
 
+    // (De)Serialization
+    Loadout& load(const nlohmann::json& j);
     template <class Archive>
     void serialize(Archive& ar) { ar(head, torso, hands, legs, weapon, moveset); };
 };
@@ -52,6 +63,8 @@ struct ControlScheme {
     KeyboardKey pause       = KEY_ESCAPE;
     KeyboardKey reset       = KEY_BACKSPACE;
 
+    // (De)Serialization
+    ControlScheme& load(const nlohmann::json& j);
     template <class Archive>
     void serialize(Archive& ar) { ar(move, nav, jump, select, pause, reset); };
 };
@@ -60,16 +73,21 @@ struct Profile {
     unlock_map<Equipment> equipment;
     unlock_map<Technique> moves;
 
+    // (De)Serialization
+    Profile& load(const nlohmann::json& j);
     template <class Archive>
     void serialize(Archive& ar) { ar(equipment, moves); };
 };
 
-struct Context {
-    Action action;
-    // std::chrono:: t;
+struct Action {
+    ActionType type;
+    u_int8_t index;
+
+    // (De)Serialization
+    Action& load(const nlohmann::json& j);
+    template <class Archive>
+    void serialize(Archive& ar) { ar(type, index); };
 };
-
-
 
 
 #endif // SUPERFLAPPY_PROPERTIES_HPP

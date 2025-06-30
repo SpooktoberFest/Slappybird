@@ -1,8 +1,12 @@
-#include "game.hpp"
+#include "scene.hpp"
 #include "debug.hpp"
-#include <fstream>
 
 const static auto src = "Scene";
+
+
+#define foreach_if_exists(str) if (j.count(str)) for (const auto& elem : j[str])
+
+
 
 Scene::Scene() {
     _world.player = Chararacter();
@@ -26,8 +30,36 @@ Scene::Scene() {
     // );
 
     // _buttons = {
-    //     Button{{20_b, 5_b}, {5_b, 2_b}, "Button 1", Action::TOGGLE_GROUP_1},
-    //     Button{{20_b, 8_b}, {5_b, 2_b}, "Button 2", Action::TOGGLE_GROUP_2}
+    //     Button{{20_b, 5_b}, {5_b, 2_b}, "Button 1", ActionType::TOGGLE_GROUP_1},
+    //     Button{{20_b, 8_b}, {5_b, 2_b}, "Button 2", ActionType::TOGGLE_GROUP_2}
     // };
 };
+
+
+Scene& Scene::load(const nlohmann::json& j) {
+    if (j.count("player"))  _world.player = Chararacter().load(j["player"]);
+    foreach_if_exists("enemies")    _world.enemies.push_back(Chararacter().load(elem));
+    foreach_if_exists("spawners")   _world.spawners.push_back(Spawner().load(elem));
+    foreach_if_exists("pipe")       _world.pipes.push_back(Pipe().load(elem));
+    foreach_if_exists("buttons")    _world.buttons.push_back(Button().load(elem));
+    foreach_if_exists("platforms")  _world.platforms.push_back(Platform().load(elem));
+    foreach_if_exists("biomes")     _world.biomes.push_back(Biome().load(elem));
+    _cam_vel.load(j, "cam_pos");
+    _cam_vel.load(j, "cam_vel", QNAN);
+    _score = j.value("score", 0);
+    return *this;
+}
+
+
+
+
+
+Menu& Menu::load(const nlohmann::json& j) {
+    foreach_if_exists("buttons")       _buttons.push_back(Button().load(elem));
+    return *this;
+}
+
+
+
+
 

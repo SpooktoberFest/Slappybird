@@ -3,17 +3,20 @@
 
 #include <limits.h>
 
-enum Action : u_int8_t {
+enum ActionType : u_int8_t {
     // Actions that can be called from any world
     NOP,
     TOGGLE_GROUP,
     RESET_WORLD,
     LOAD_WORLD,
+    SHOW_WORLDS,
     LOAD_MENU,
+    
 
     // Actions that cannot be called from custom worlds
     SPECIAL_ACTION = UCHAR_MAX/2,
     EXIT_GAME,
+    SHOW_PROFILES,
     LOAD_PROFILE,
     NEW_PROFILE,
     DELETE_PROFILE,

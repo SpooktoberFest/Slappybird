@@ -11,13 +11,13 @@ template<typename T>
 class unlock_map {
 	static_assert(std::is_enum_v<T>, "T must be an enum type");
 	using U = std::underlying_type_t<T>;
-
-	std::vector<U> _data; // pairs of [start, end)
-
 public:
 	unlock_map() = default;
 	unlock_map(std::vector<U> vec) : _data(std::move(vec)) {};
 	~unlock_map() = default;
+
+
+	std::vector<U> _data; // pairs of [start, end)
 
 	void push(const T& item) {
 		U entry = static_cast<U>(item);
@@ -58,6 +58,7 @@ public:
 		return false;
 	}
 
+    // (De)Serialization
 	template <class Archive>
 	void serialize(Archive& ar) {
 		ar(_data);

@@ -118,10 +118,13 @@ bool Serializer::devModeLoad(std::string path) {
     if (data.contains("scenes")) {
         for (const auto& j : data["scenes"]) {
             ++total;
-            std::string name = j["name"];
-            auto scene_opt = from_json(j["data"]);
-            if (scene_opt) saveScene(name, &(*scene_opt));
-            else ++failures;
+            try {
+                Scene scene = Scene().load(j["data"]);
+                saveScene(j["name"], &scene);
+            } catch (const std::exception& e) {
+                LOG_ERROR(src, "Failed to parse scene: " + std::string(e.what()));
+                ++failures;
+            }
         }
     }
 
@@ -129,19 +132,9 @@ bool Serializer::devModeLoad(std::string path) {
     if (data.contains("menus")) {
         for (const auto& j : data["menus"]) {
             ++total;
-            Menu menu;
             try {
-                // Menu Buttons
-                for (const auto& b : j["data"]["buttons"]) {
-                    Button button;
-                    get_maybe_vec2(b, button.pos, "pos");
-                    get_maybe_vec2(b, button.size, "size");
-                    button.action = b.value("action", Action::NOP);
-                    button.parameter = b.value("parameter", 0);
-                    button.text = b.value("text", "");
-                    menu._buttons.push_back(std::move(button));
-                }
-            saveMenu(j["name"], &menu);
+                Menu menu = Menu().load(j["data"]);
+                saveMenu(j["name"], &menu);
             } catch (const std::exception& e) {
                 LOG_ERROR(src, "Failed to parse menu: " + std::string(e.what()));
                 ++failures;
@@ -154,10 +147,7 @@ bool Serializer::devModeLoad(std::string path) {
         for (const auto& j : data["profiles"]) {
             ++total;
             try {
-                Profile profile{
-                    unlock_map<Equipment>(j["data"].value("equipment", std::vector<u_int16_t>())),
-                    unlock_map<Technique>(j["data"].value("moves", std::vector<u_int16_t>()))
-                };
+                Profile profile = Profile().load(j["data"]);
                 saveProfile(j["name"], &profile);
             } catch (const std::exception& e) {
                 LOG_ERROR(src, "Failed to parse profile: " + std::string(e.what()));
@@ -171,73 +161,6 @@ bool Serializer::devModeLoad(std::string path) {
 
 }
 
-std::optional<Scene> Serializer::from_json(const json& json_data) {
-    Scene scene;
-    std::string breakpoint;
-
-    try {
-        breakpoint = "player";
-        if (json_data.count("player")) {
-            auto& in = json_data["player"];
-            get_maybe_vec2(in, scene._world.player->pos, "pos");
-            get_maybe_vec2(in, scene._world.player->vel, "vel");
-        };
-        breakpoint = "pipes";
-        if (json_data.count("pipes")) {
-            Pipe pipe;
-            for (const auto& j : json_data["pipes"]) {
-                get_maybe_vec2(j, pipe.pos, "pos");
-                scene._world.pipes.push_back(std::move(pipe));
-            }
-        };
-        breakpoint = "buttons";
-        if (json_data.count("buttons")) {
-            Button button;
-            for (const auto& j : json_data["buttons"]) {
-                get_maybe_vec2(j, button.pos, "pos");
-                get_maybe_vec2(j, button.size, "size");
-                button.action = j.value("action", Action::NOP);
-                button.parameter = j.value("parameter", 0);
-                button.text = j.value("text", "");
-                scene._world.buttons.push_back(std::move(button));
-            }
-        };
-        breakpoint = "platforms";
-        if (json_data.count("platforms")) {
-            Platform platform;
-            for (const auto& j : json_data["platforms"]) {
-                get_maybe_vec2(j, platform.pos, "pos");
-                get_maybe_vec2(j, platform.size, "size");
-                scene._world.platforms.push_back(std::move(platform));
-            }
-        };
-        breakpoint = "biomes";
-        if (json_data.count("biomes")) {
-            Biome biome;
-            for (const auto& j : json_data["biomes"]) {
-                biome.pipe_width = j.value("pipe_width", biome.pipe_width);
-                biome.gap_height = j.value("gap_height", biome.gap_height);
-                biome.gravity = j.value("gravity", biome.gravity);
-                biome.jump_strength = j.value("jump_strength", biome.jump_strength);
-                biome.pipe_speed = j.value("pipe_speed", biome.pipe_speed);
-                biome.move_speed = j.value("move_speed", biome.move_speed);
-                scene._world.biomes.push_back(std::move(biome));
-            }
-        };
-
-        breakpoint = "score";
-        scene._score = json_data.value("score", 0);
-        breakpoint = "camera";
-        get_maybe_vec2(json_data, scene._cam_pos, "cam_pos");
-        scene._cam_vel.x = json_data.value("cam_vel_x", QNAN);
-        scene._cam_vel.y = json_data.value("cam_vel_y", QNAN);
-
-        return scene;
-    } catch (const std::exception& e) {
-        LOG_ERROR(src, "Unexpected exception during processing of scene." + breakpoint + ": " + std::string(e.what()));
-        return std::nullopt;
-    }
-}
 
 std::vector<std::string> Serializer::get_files(const int start_index, const std::string& path, std::string type) {
     std::vector<std::string> matched_files;

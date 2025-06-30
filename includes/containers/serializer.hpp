@@ -37,20 +37,12 @@ public:
 
 private:
 
-    std::optional<Scene> from_json(const nlohmann::json& j);
-
     // std::optional<Scene> fetch_scene(const std::string& name, bool custom);
     // void send_scene(const std::string& name, bool custom);
     // std::optional<Profile> fetch_profile(const std::string& name);
     // void send_profile(const std::string& name);
     // bool saveSceneToDB(const std::string& name, const Scene& scene, bool custom);
 
-    inline void get_maybe_vec2(const nlohmann::json& json_data, Vec2& write_to, const std::string field_name) {
-        if (json_data.count(field_name)) {
-            std::vector<float> tmp = json_data[field_name].get<std::vector<float>>();
-            write_to = {tmp[0]*BLOCK, tmp[1]*BLOCK};
-        }
-    };
 
 
 };

@@ -6,7 +6,9 @@
 #include <vector>
 #include <optional>
 #include <array>
+
 #include <cereal/types/vector.hpp>
+#include <nlohmann/json.hpp>
 
 #include "entities.hpp"
 
@@ -18,12 +20,14 @@ public:
     virtual ~Scene() {};
 
     World _world;
-    unsigned short _selected;
+    u_int8_t _selected;
     Vec2 _cam_vel = {QNAN, QNAN}; // Where QNAN means follow player
     Vec2 _cam_pos;
-    unsigned short _score = 0;
+    u_int16_t _score = 0;
+    std::vector<Action> _actions = {{ActionType::LOAD_WORLD, 0}};
 
-    // Serialization function for cereal
+    // (De)Serialization
+    Scene& load(const nlohmann::json& j);
     template <class Archive>
     void serialize(Archive& ar) {
         ar(_world, _cam_vel, _cam_pos, _score);
@@ -32,8 +36,10 @@ public:
 
 struct Menu {
     std::vector<Button> _buttons;
-    unsigned short _selected;
+    u_int8_t _selected;
 
+    // (De)Serialization
+    Menu& load(const nlohmann::json& j);
     template <class Archive>
     void serialize(Archive& ar) {
         ar(_buttons);

@@ -48,6 +48,7 @@ void Game::render() {
     DrawRectangle(0, 0, _res.x, _res.y, WHITE);
     EndShaderMode();
 
+    const bool is_running = _gamestate == GameState::RUNNING;
     Biome& b = _scene._world.biomes[0];
 
     // Pipes
@@ -63,7 +64,6 @@ void Game::render() {
     }
 
     // Scene Buttons
-    const bool is_running = _gamestate == GameState::RUNNING;
     for (const auto& button : _scene._world.buttons) {
             const auto hitbox = button.rect(_res);
             DrawRectangleRec(hitbox, (is_running ? WHITE : GRAY));
@@ -73,6 +73,7 @@ void Game::render() {
         if (_scene._selected < _scene._world.buttons.size())
             DrawRectangleLinesEx(_scene._world.buttons[_scene._selected].rect(_res), 5.0f, YELLOW);
     }
+
     // Menu Buttons
     else {
         const Menu& menu = _menus.top();

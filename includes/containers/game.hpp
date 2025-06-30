@@ -22,14 +22,19 @@ public:
     Game();
     virtual ~Game();
 
-    GameState get_gamestate() { return _gamestate; };
+    // Getters
+    const GameState get_gamestate() const { return _gamestate; };
+    const Vector2 get_res() const { return _res; };
+    const Serializer& get_serializer() const { return _serializer; };
+    const Scene& get_scene() const { return _scene; };
+    const Menu& get_menu() const { return _menus.top(); };
+    const ControlScheme& get_controls() const { return _controls; };
 
     void simulate();
     void render();
     void reset_scene(const Scene* scene=nullptr);
     bool is_quit() const;
 
-    Serializer _serializer;
 
 private:
 
@@ -49,6 +54,7 @@ private:
     Vector2 _res = {800, 480}; // Window resolution {25_b, 15_b}
 
     // Misc
+    Serializer _serializer;
     Shader _gradient_shader;
     ControlScheme _controls;
 
