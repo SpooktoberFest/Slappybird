@@ -41,6 +41,7 @@ private:
     void handle_collision();
     void handle_input();
     void handle_spawning();
+    void handle_entitysim();
     void handle_action(const Action& action);
     void set_background(OptColor color1, OptColor color2);
     void update_resolution(const bool override=false);

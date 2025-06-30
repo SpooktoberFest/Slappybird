@@ -39,6 +39,17 @@ Game::~Game() {
     LOG_INFO(src, "Closed Raylib Components");
 };
 
+
+void Game::simulate() {
+    handle_input();
+    if (_gamestate >= GameState::PAUSED) return;
+    handle_entitysim();
+    if (_gamestate >= GameState::GAMEOVER) return;
+    handle_spawning();
+    handle_collision();
+    _scene._actions.clear();
+};
+
 void Game::render() {
     update_resolution();
     BeginDrawing();

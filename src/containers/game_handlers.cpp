@@ -10,14 +10,11 @@ const static auto src = "Game";
 #define branchless_ternary(pred, a, b) (a & -pred) | (b & ~-pred)
 
 
-void Game::simulate() {
 
-    handle_input();
 
-    if (_gamestate >= GameState::PAUSED) return;
+void Game::handle_entitysim() {
 
-    // Update Bird
-    {
+    {   // Update Bird
         Chararacter& p = *_scene._world.player;
         p.vel.y += _scene._world.biomes[0].gravity;
         p.pos.x += std::min(p.vel.x, 1_b);
@@ -26,11 +23,10 @@ void Game::simulate() {
         // p.pos.y += p.vel.y;
     }
 
-
     if (_gamestate >= GameState::GAMEOVER) return;
+
     
-    // Update Camera
-    {
+    {   // Update Camera
         Chararacter& p = *_scene._world.player;
         const Vec2& cam_vel = _scene._cam_vel;
         Vec2& cam_pos = _scene._cam_pos;
@@ -42,12 +38,7 @@ void Game::simulate() {
         else cam_pos.y += cam_vel.y;
     }
 
-    handle_spawning();
-
-    handle_collision();
-
-    _scene._actions.clear();
-};
+}
 
 void Game::handle_spawning() {
     for (const auto& spawner : _scene._world.spawners) {
