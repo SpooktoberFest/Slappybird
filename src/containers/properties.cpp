@@ -1,6 +1,22 @@
 #include "properties.hpp"
 
+#include "raylib.h"
+
 #include "json_fwd.hpp"
+
+#define K(key) static_cast<KeyboardKey_>(key)
+Vec2::operator Vector2() const { return {x, y}; };
+
+ControlScheme::ControlScheme() :
+    move({K(KEY_UP), K(KEY_DOWN), K(KEY_LEFT), K(KEY_RIGHT)}),
+    nav({K(KEY_W), K(KEY_S), K(KEY_A), K(KEY_UP)}),
+    jump(K(KEY_SPACE)),
+    select(K(KEY_ENTER)),
+    pause(K(KEY_ESCAPE)),
+    reset(K(KEY_BACKSPACE)) {};
+
+
+// Load
 
 Vec2& Vec2::load(const JsonFwd& jf, const std::string field, float def) {
     const nlohmann::json& j = jf;

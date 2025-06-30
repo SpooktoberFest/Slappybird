@@ -1,28 +1,21 @@
 #ifndef SUPERFLAPPY_ENTITIES_HPP
 #define SUPERFLAPPY_ENTITIES_HPP
 
-#include "raylib.h"
 #include <string>
-
-#include "properties.hpp"
-#include "algorithm"
-#include "functional"
 
 #include <cereal/types/string.hpp>
 #include <cereal/types/vector.hpp>
 #include <cereal/types/optional.hpp>
 
-// Forward declarations
-struct Spawner; struct Game; struct World;
+#include "forward_decl.hpp"
+#include "properties.hpp"
 
 
 struct Chararacter {
     Vec2 pos;
     Vec2 vel;
 
-    constexpr Rectangle rect(float w=1_b, float h=1_b) const {
-         return Rectangle{pos.x, pos.y, std::move(w), std::move(h)};
-    };
+    Rectangle rect(float w=1_b, float h=1_b) const;
 
     // (De)Serialization
     Chararacter& load(const JsonFwd& jf);
@@ -34,8 +27,7 @@ struct Pipe {
     Vec2 pos;
     bool passed;
 
-    constexpr std::array<Rectangle, 2> rect(const float w, const float h) const
-        { return {Rectangle{pos.x, 0, w, pos.y}, Rectangle{pos.x, pos.y+h, w, 12_b}}; };
+    std::array<Rectangle, 2> rect(const float w, const float h) const;
 
     // (De)Serialization
     Pipe& load(const JsonFwd& jf);
@@ -47,8 +39,7 @@ struct Platform {
     Vec2 pos;
     Vec2 size {1_b, 1_b};
 
-    constexpr Rectangle rect() const
-        { return Rectangle{pos.x, pos.y, size.x, size.y}; };
+    Rectangle rect() const;
 
     // (De)Serialization
     Platform& load(const JsonFwd& jf);
@@ -63,12 +54,7 @@ struct Button {
     Action action;
     int parameter;
 
-    constexpr Rectangle rect(const Vector2& res) const {
-        return Rectangle{
-            (pos.x < 0.0f ? res.x + pos.x : pos.x),
-            (pos.y < 0.0f ? res.y + pos.y : pos.y),
-            size.x, size.y};
-        };
+    Rectangle rect(const Vector2& res) const;
 
     // (De)Serialization
     Button& load(const JsonFwd& jf);

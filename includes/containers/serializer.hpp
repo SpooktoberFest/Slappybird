@@ -1,12 +1,8 @@
 #ifndef SUPERFLAPPY_SERIALIZER_HPP
 #define SUPERFLAPPY_SERIALIZER_HPP
 
-#include <optional>
-#include <memory>
-
 #include "scene.hpp"
 #include "properties.hpp"
-// #include "entities.hpp"
 
 class Serializer {
 public:

@@ -2,7 +2,6 @@
 #define SUPERFLAPPY_UNLOCK_MAP_HPP
 
 #include <vector>
-#include <algorithm>
 #include <type_traits>
 
 #include <cereal/types/vector.hpp>

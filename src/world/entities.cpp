@@ -1,8 +1,11 @@
 #include "entities.hpp"
 
+#include "algorithm"
 #include "json_fwd.hpp"
 
 #include "game.hpp"
+
+#include "raylib.h"
 
 #define foreach_if_exists(str) if (j.count(str)) for (const auto& elem : j[str])
 
@@ -22,8 +25,25 @@ bool Spawner::check_predicate(const Game& context) const {
 }
 
 
+// Rect functions
 
-// Load functions
+Rectangle Chararacter::rect(float w, float h) const {
+    return Rectangle{pos.x, pos.y, std::move(w), std::move(h)};
+};
+std::array<Rectangle, 2> Pipe::rect(const float w, const float h) const {
+    return {Rectangle{pos.x, 0, w, pos.y}, Rectangle{pos.x, pos.y+h, w, 12_b}};
+};
+Rectangle Platform::rect() const {
+    return Rectangle{pos.x, pos.y, size.x, size.y};
+};
+Rectangle Button::rect(const Vector2& res) const {
+    return Rectangle{
+        (pos.x < 0.0f ? res.x + pos.x : pos.x),
+        (pos.y < 0.0f ? res.y + pos.y : pos.y),
+        size.x, size.y};
+};
+
+// Load() functions
 
 Chararacter& Chararacter::load(const JsonFwd& jf) {
     const nlohmann::json& j = jf;

@@ -1,11 +1,7 @@
 #ifndef SUPERFLAPPY_SCENE_HPP
 #define SUPERFLAPPY_SCENE_HPP
 
-#include <stdlib.h>
-#include <limits>
 #include <vector>
-#include <optional>
-#include <array>
 
 #include <cereal/types/vector.hpp>
 

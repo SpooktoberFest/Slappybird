@@ -2,20 +2,17 @@
 #define SUPERFLAPPY_PROPERTIES_HPP
 
 #include <array>
-#include <vector>
-#include <chrono>
+#include <limits>
 
-#include "raylib.h"
 #include <cereal/types/array.hpp>
 
+#include "forward_decl.hpp"
 #include "unlock_map.hpp"
 #include "enums.hpp"
 
 #define QNAN std::numeric_limits<float>::quiet_NaN()
 #define BLOCK 32.0f
 
-// Forward declaration
-struct JsonFwd;
 
 // Literal for block unit
 constexpr float operator"" _b(unsigned long long value) {
@@ -31,7 +28,7 @@ struct Vec2 {
         if (y == QNAN) y = other.y;
         return *this;
     }
-    operator Vector2() const { return {x, y}; };
+    operator Vector2() const;
 
     // (De)Serialization
     Vec2& load(const JsonFwd& jf, const std::string field, const float def=0);
@@ -54,16 +51,13 @@ struct Loadout {
 };
 
 struct ControlScheme {
-    std::array<KeyboardKey, 4> move = {
-        KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT 
-    };
-    std::array<KeyboardKey, 4> nav = {
-        KEY_W, KEY_S, KEY_A, KEY_UP 
-    };
-    KeyboardKey jump        = KEY_SPACE;
-    KeyboardKey select      = KEY_ENTER;
-    KeyboardKey pause       = KEY_ESCAPE;
-    KeyboardKey reset       = KEY_BACKSPACE;
+    ControlScheme();
+    std::array<KeyboardKey_, 4> move;
+    std::array<KeyboardKey_, 4> nav;
+    KeyboardKey_ jump;
+    KeyboardKey_ select;
+    KeyboardKey_ pause;
+    KeyboardKey_ reset;
 
     // (De)Serialization
     ControlScheme& load(const JsonFwd& jf);

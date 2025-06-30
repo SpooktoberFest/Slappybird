@@ -5,7 +5,10 @@
 #include "operators.hpp"
 #include "debug.hpp"
 
+#include "raylib.h"
+
 const static auto src = "Game";
+
 
 Game::Game() {
     // SetConfigFlags(FLAG_WINDOW_RESIZABLE); // FLAG_FULLSCREEN_MODE
@@ -14,8 +17,8 @@ Game::Game() {
     SetTargetFPS(60);
     SetExitKey(KEY_NULL);
 
-
     _gradient_shader = LoadShader(0, "resources/shaders/gradient.fs");
+
     update_resolution(true);
     set_background({{0.4f, 0.4f, 0.8f}}, {{0.2f, 0.2f, 0.4f}});
 
@@ -114,7 +117,7 @@ void Game::render() {
 void Game::update_resolution(const bool override) {
     Vector2 res = {(float)GetScreenWidth(), (float)GetScreenHeight()};
     if (override || !(res == _res)) {
-        _res = res;
+        _res = {res.x, res.y};
         SetShaderValue(
             _gradient_shader,
             GetShaderLocation(_gradient_shader, "resolution"),

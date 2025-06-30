@@ -1,14 +1,15 @@
 #ifndef SUPERFLAPPY_GAME_HPP
 #define SUPERFLAPPY_GAME_HPP
 
-#include <vector>
 #include <optional>
 #include <array>
 #include <stack>
 
-#include "entities.hpp"
+#include "forward_decl.hpp"
+#include "properties.hpp"
 #include "scene.hpp"
 #include "serializer.hpp"
+
 
 
 class Game {
@@ -22,7 +23,7 @@ public:
     Game();
     virtual ~Game();
 
-    // Getters for spawners
+    // Getters for Spawners
     const Scene& get_scene() const { return _scene; };
     // const GameState get_gamestate() const { return _gamestate; };
     // const Vector2 get_res() const { return _res; };
@@ -55,9 +56,9 @@ private:
     GameState _gamestate = GameState::INIT;
 
     // Misc
-    Vector2 _res = {25_b, 15_b}; // Window resolution
+    Vec2 _res = {25_b, 15_b}; // Window resolution
     Serializer _serializer;
-    Shader _gradient_shader;
+    Shader_ _gradient_shader;
     ControlScheme _controls;
 };
 

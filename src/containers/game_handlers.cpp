@@ -5,6 +5,8 @@
 #include "operators.hpp"
 #include "debug.hpp"
 
+#include "raylib.h"
+
 #define branchless_ternary(pred, a, b) (a & -pred) | (b & ~-pred)
 const static auto src = "Game";
 
