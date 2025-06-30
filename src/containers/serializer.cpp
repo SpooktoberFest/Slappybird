@@ -9,9 +9,9 @@
 #include <cereal/archives/binary.hpp>
 // #include <sqlite3.h>
 
+#include "json_fwd.hpp"
 #include "debug.hpp"
 
-using json = nlohmann::json;
 namespace fs = std::filesystem;
 
 const static auto src = "Serializer";
@@ -97,7 +97,7 @@ bool Serializer::saveMenu(std::string name, Menu* menu_opt) {
 
 bool Serializer::devModeLoad(std::string path) {
     LOG_INFO(src, "Translating JSON data...");
-    json data;
+    nlohmann::json data;
 
     try {
         std::ifstream is(path);
@@ -105,7 +105,7 @@ bool Serializer::devModeLoad(std::string path) {
             LOG_ERROR(src, "Failed to load file at path: " + path);
             return false;
         }
-        data = json::parse(is);
+        data = nlohmann::json::parse(is);
     } catch (const std::exception& e) {
         LOG_ERROR(src, "Failed to parse JSON file: " + std::string(e.what()));
         return false;

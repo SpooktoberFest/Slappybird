@@ -4,8 +4,6 @@
 #include <optional>
 #include <memory>
 
-#include <nlohmann/json.hpp>
-
 #include "scene.hpp"
 #include "properties.hpp"
 // #include "entities.hpp"

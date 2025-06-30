@@ -65,6 +65,19 @@ Context:
 
 
 
+error: binding reference of type 
+
+‘ nlohmann::json_abi_v3_12_0::json&’                                 {aka ‘ nlohmann::json_abi_v3_12_0::basic_json<>&’} to 
+‘ const nlohmann::json_abi_v3_12_0::basic_json<>::value_type’        {aka ‘ const nlohmann::json_abi_v3_12_0::basic_json<>’} discards qualifiers
+
+
+  122 |                 Scene scene = Scene().load(JsonFwd{j["data"]});
+      |                                                             ^
+
+
+
+      
+
 ```
 
 

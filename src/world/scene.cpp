@@ -1,12 +1,10 @@
 #include "scene.hpp"
 #include "debug.hpp"
 
-const static auto src = "Scene";
-
+#include "json_fwd.hpp"
 
 #define foreach_if_exists(str) if (j.count(str)) for (const auto& elem : j[str])
-
-
+const static auto src = "Scene";
 
 Scene::Scene() {
     _world.player = Chararacter();
@@ -35,9 +33,11 @@ Scene::Scene() {
     // };
 };
 
+// Load functions
 
-Scene& Scene::load(const nlohmann::json& j) {
-    if (j.count("player"))  _world.player = Chararacter().load(j["player"]);
+Scene& Scene::load(const JsonFwd& jf) {
+    const nlohmann::json& j = jf;
+    if (j.count("player"))           _world.player = Chararacter().load(j["player"]);
     foreach_if_exists("enemies")    _world.enemies.push_back(Chararacter().load(elem));
     foreach_if_exists("spawners")   _world.spawners.push_back(Spawner().load(elem));
     foreach_if_exists("pipe")       _world.pipes.push_back(Pipe().load(elem));
@@ -49,12 +49,8 @@ Scene& Scene::load(const nlohmann::json& j) {
     _score = j.value("score", 0);
     return *this;
 }
-
-
-
-
-
-Menu& Menu::load(const nlohmann::json& j) {
+Menu& Menu::load(const JsonFwd& jf) {
+    const nlohmann::json& j = jf;
     foreach_if_exists("buttons")       _buttons.push_back(Button().load(elem));
     return *this;
 }

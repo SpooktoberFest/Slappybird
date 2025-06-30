@@ -1,13 +1,17 @@
 #include "properties.hpp"
 
-Vec2& Vec2::load(const nlohmann::json& j, const std::string field, const float def) {
+#include "json_fwd.hpp"
+
+Vec2& Vec2::load(const JsonFwd& jf, const std::string field, float def) {
+    const nlohmann::json& j = jf;
     if (!j.count(field)) { x = def; y = def; return *this; }
     const auto& arr = j[field];
     x = arr[0].is_null() ? def : arr[0].get<float>() * BLOCK;
     y = arr[1].is_null() ? def : arr[1].get<float>() * BLOCK;
     return *this;
 }
-Loadout& Loadout::load(const nlohmann::json& j) {
+Loadout& Loadout::load(const JsonFwd& jf) {
+    const nlohmann::json& j = jf;
     head = j.value("head", head);
     torso = j.value("torso", torso);
     hands = j.value("hands", hands);
@@ -18,8 +22,8 @@ Loadout& Loadout::load(const nlohmann::json& j) {
         moveset[i] = static_cast<Technique>(tmp[i]);
     return *this;
 }
-ControlScheme& ControlScheme::load(const nlohmann::json& j) {
-    // std::vector<KeyboardKey> tmp;
+ControlScheme& ControlScheme::load(const JsonFwd& jf) {
+    const nlohmann::json& j = jf;
     move = j.value("move", move);
     nav = j.value("nav", nav);
     jump = j.value("jump", jump);
@@ -28,12 +32,14 @@ ControlScheme& ControlScheme::load(const nlohmann::json& j) {
     reset = j.value("reset", reset);
     return *this;
 }
-Profile& Profile::load(const nlohmann::json& j) {
+Profile& Profile::load(const JsonFwd& jf) {
+    const nlohmann::json& j = jf;
     equipment = unlock_map<Equipment>(j.value("equipment", std::vector<u_int16_t>()));
     moves = unlock_map<Technique>(j.value("moves", std::vector<u_int16_t>()));
     return *this;
 }
-Action& Action::load(const nlohmann::json& j) {
+Action& Action::load(const JsonFwd& jf) {
+    const nlohmann::json& j = jf;
 
     return *this;
 }

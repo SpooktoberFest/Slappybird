@@ -7,13 +7,15 @@
 
 #include "raylib.h"
 #include <cereal/types/array.hpp>
-#include <nlohmann/json.hpp>
 
 #include "unlock_map.hpp"
 #include "enums.hpp"
 
 #define QNAN std::numeric_limits<float>::quiet_NaN()
 #define BLOCK 32.0f
+
+// Forward declaration
+struct JsonFwd;
 
 // Literal for block unit
 constexpr float operator"" _b(unsigned long long value) {
@@ -32,7 +34,7 @@ struct Vec2 {
     operator Vector2() const { return {x, y}; };
 
     // (De)Serialization
-    Vec2& load(const nlohmann::json& j, const std::string field, const float def=0);
+    Vec2& load(const JsonFwd& jf, const std::string field, const float def=0);
     template <class Archive>
     void serialize(Archive& ar) { ar(x, y); };
 };
@@ -46,7 +48,7 @@ struct Loadout {
     std::array<Technique, 4> moveset;
 
     // (De)Serialization
-    Loadout& load(const nlohmann::json& j);
+    Loadout& load(const JsonFwd& jf);
     template <class Archive>
     void serialize(Archive& ar) { ar(head, torso, hands, legs, weapon, moveset); };
 };
@@ -64,7 +66,7 @@ struct ControlScheme {
     KeyboardKey reset       = KEY_BACKSPACE;
 
     // (De)Serialization
-    ControlScheme& load(const nlohmann::json& j);
+    ControlScheme& load(const JsonFwd& jf);
     template <class Archive>
     void serialize(Archive& ar) { ar(move, nav, jump, select, pause, reset); };
 };
@@ -74,7 +76,7 @@ struct Profile {
     unlock_map<Technique> moves;
 
     // (De)Serialization
-    Profile& load(const nlohmann::json& j);
+    Profile& load(const JsonFwd& jf);
     template <class Archive>
     void serialize(Archive& ar) { ar(equipment, moves); };
 };
@@ -84,7 +86,7 @@ struct Action {
     u_int8_t index;
 
     // (De)Serialization
-    Action& load(const nlohmann::json& j);
+    Action& load(const JsonFwd& jf);
     template <class Archive>
     void serialize(Archive& ar) { ar(type, index); };
 };

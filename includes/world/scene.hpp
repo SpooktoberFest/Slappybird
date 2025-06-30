@@ -8,7 +8,6 @@
 #include <array>
 
 #include <cereal/types/vector.hpp>
-#include <nlohmann/json.hpp>
 
 #include "entities.hpp"
 
@@ -27,7 +26,7 @@ public:
     std::vector<Action> _actions = {{ActionType::LOAD_WORLD, 0}};
 
     // (De)Serialization
-    Scene& load(const nlohmann::json& j);
+    Scene& load(const JsonFwd& jf);
     template <class Archive>
     void serialize(Archive& ar) {
         ar(_world, _cam_vel, _cam_pos, _score);
@@ -39,7 +38,7 @@ struct Menu {
     u_int8_t _selected;
 
     // (De)Serialization
-    Menu& load(const nlohmann::json& j);
+    Menu& load(const JsonFwd& jf);
     template <class Archive>
     void serialize(Archive& ar) {
         ar(_buttons);

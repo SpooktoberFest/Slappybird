@@ -11,10 +11,9 @@
 #include <cereal/types/string.hpp>
 #include <cereal/types/vector.hpp>
 #include <cereal/types/optional.hpp>
-#include "nlohmann/json.hpp"
 
-
-struct Spawner; // Forward declaration
+// Forward declarations
+struct Spawner; struct Game; struct World;
 
 
 struct Chararacter {
@@ -26,7 +25,7 @@ struct Chararacter {
     };
 
     // (De)Serialization
-    Chararacter& load(const nlohmann::json& j);
+    Chararacter& load(const JsonFwd& jf);
     template <class Archive>
     void serialize(Archive& ar) { ar(vel, pos); }
 };
@@ -39,7 +38,7 @@ struct Pipe {
         { return {Rectangle{pos.x, 0, w, pos.y}, Rectangle{pos.x, pos.y+h, w, 12_b}}; };
 
     // (De)Serialization
-    Pipe& load(const nlohmann::json& j);
+    Pipe& load(const JsonFwd& jf);
     template <class Archive>
     void serialize(Archive& ar) { ar(pos);};
 };
@@ -52,7 +51,7 @@ struct Platform {
         { return Rectangle{pos.x, pos.y, size.x, size.y}; };
 
     // (De)Serialization
-    Platform& load(const nlohmann::json& j);
+    Platform& load(const JsonFwd& jf);
     template <class Archive>
     void serialize(Archive& ar) { ar(pos, size); }
 };
@@ -72,7 +71,7 @@ struct Button {
         };
 
     // (De)Serialization
-    Button& load(const nlohmann::json& j);
+    Button& load(const JsonFwd& jf);
     template <class Archive>
     void serialize(Archive& ar) { ar(pos, size, text, action, parameter); }
 };
@@ -89,7 +88,7 @@ struct Biome {
     float jump_strength = -8.0f;
 
     // (De)Serialization
-    Biome& load(const nlohmann::json& j);
+    Biome& load(const JsonFwd& jf);
     template <class Archive>
     void serialize(Archive& ar) {
         ar( pos, pipe_width, gap_height, pipe_speed,
@@ -107,7 +106,7 @@ struct World {
     std::vector<Biome> biomes;
 
     // (De)Serialization
-    World& load(const nlohmann::json& j);
+    World& load(const JsonFwd& jf);
     template <class Archive>
     void serialize(Archive& ar) {
         ar(player, enemies, spawners, pipes, buttons, platforms, biomes);
@@ -121,24 +120,10 @@ struct Spawner {
     bool use_index;
     World spawn_in;
 
-    template<typename Game_>
-    bool check_predicate(const Game_& context) const {
-        bool do_spawn = false;
-        const std::vector<Action>& actions = context.get_scene()._actions;
-        return (
-            actions.end() !=
-            std::find_if(actions.begin(), actions.end(),
-                [&](const Action& elem) {
-                    if (elem.type != predicate.type) return false;
-                    if (!use_index) return true;
-                    return (elem.index != predicate.index);
-                }
-            )
-        );
-    }
+    bool check_predicate(const Game& context) const;
 
     // (De)Serialization
-    Spawner& load(const nlohmann::json& j);
+    Spawner& load(const JsonFwd& jf);
     template <class Archive>
     void serialize(Archive& ar) { ar(vel, pos, predicate, use_index, spawn_in); }
 };

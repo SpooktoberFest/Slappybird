@@ -5,11 +5,8 @@
 #include "operators.hpp"
 #include "debug.hpp"
 
-const static auto src = "Game";
-
 #define branchless_ternary(pred, a, b) (a & -pred) | (b & ~-pred)
-
-
+const static auto src = "Game";
 
 
 void Game::handle_entitysim() {

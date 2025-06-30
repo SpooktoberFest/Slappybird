@@ -110,6 +110,7 @@ void Game::render() {
     EndDrawing();
 }
 
+
 void Game::update_resolution(const bool override) {
     Vector2 res = {(float)GetScreenWidth(), (float)GetScreenHeight()};
     if (override || !(res == _res)) {

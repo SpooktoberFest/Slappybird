@@ -1,22 +1,49 @@
 #include "entities.hpp"
 
+#include "json_fwd.hpp"
+
+#include "game.hpp"
+
 #define foreach_if_exists(str) if (j.count(str)) for (const auto& elem : j[str])
 
-Chararacter& Chararacter::load(const nlohmann::json& j) {
+
+bool Spawner::check_predicate(const Game& context) const {
+    const std::vector<Action>& actions = context.get_scene()._actions;
+    return (
+        actions.end() !=
+        std::find_if(actions.begin(), actions.end(),
+            [&](const Action& elem) {
+                if (elem.type != predicate.type) return false;
+                if (!use_index) return true;
+                return (elem.index != predicate.index);
+            }
+        )
+    );
+}
+
+
+
+// Load functions
+
+Chararacter& Chararacter::load(const JsonFwd& jf) {
+    const nlohmann::json& j = jf;
     pos.load(j, "pos");
     vel.load(j, "vel");
     return *this;
 }
-Pipe& Pipe::load(const nlohmann::json& j) {
+Pipe& Pipe::load(const JsonFwd& jf) {
+    const nlohmann::json& j = jf;
     pos.load(j, "pos");
     return *this;
 }
-Platform& Platform::load(const nlohmann::json& j) {
+Platform& Platform::load(const JsonFwd& jf) {
+    const nlohmann::json& j = jf;
     pos.load(j, "pos");
     size.load(j, "size", 1_b);
     return *this;
 }
-Button& Button::load(const nlohmann::json& j) {
+Button& Button::load(const JsonFwd& jf) {
+    const nlohmann::json& j = jf;
     pos.load(j, "pos");
     size.load(j, "size", 1_b);
     action.type = j.value("action_type", ActionType::NOP);
@@ -25,7 +52,8 @@ Button& Button::load(const nlohmann::json& j) {
     text = j.value("text", "");
     return *this;
 }
-Biome& Biome::load(const nlohmann::json& j) {
+Biome& Biome::load(const JsonFwd& jf) {
+    const nlohmann::json& j = jf;
     pipe_width = j.value("pipe_width", pipe_width);
     gap_height = j.value("gap_height", gap_height);
     gravity = j.value("gravity", gravity);
@@ -34,7 +62,8 @@ Biome& Biome::load(const nlohmann::json& j) {
     move_speed = j.value("move_speed", move_speed);
     return *this;
 }
-World& World::load(const nlohmann::json& j) {
+World& World::load(const JsonFwd& jf) {
+    const nlohmann::json& j = jf;
     if (j.count("player"))  player = Chararacter().load(j["player"]);
     foreach_if_exists("enemies")    enemies.push_back(Chararacter().load(elem));
     foreach_if_exists("spawners")   spawners.push_back(Spawner().load(elem));
@@ -44,7 +73,8 @@ World& World::load(const nlohmann::json& j) {
     foreach_if_exists("biomes")     biomes.push_back(Biome().load(elem));
     return *this;
 }
-Spawner& Spawner::load(const nlohmann::json& j) {
+Spawner& Spawner::load(const JsonFwd& jf) {
+    const nlohmann::json& j = jf;
     pos.load(j, "pos");
     vel.load(j, "vel");
     predicate.type = j.value("action_type", ActionType::NOP);
