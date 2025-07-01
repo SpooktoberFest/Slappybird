@@ -6,7 +6,7 @@
 ## Preamble
 Hello!
 
-This is a basic game engine that I am developing, and intend to use for a simple game.
+This is a basic game that I am developing.
 
 Yup. Thats about it. Bye!
 
