@@ -35,7 +35,7 @@ Scene::Scene() {
 
 // Load functions
 
-Scene& Scene::load(const JsonFwd& jf) {
+Scene& Scene::load(const JsonRef jf) {
     const nlohmann::json& j = jf;
     if (j.count("player"))           _world.player = Chararacter().load(j["player"]);
     foreach_if_exists("enemies")    _world.enemies.push_back(Chararacter().load(elem));
@@ -49,7 +49,7 @@ Scene& Scene::load(const JsonFwd& jf) {
     _score = j.value("score", 0);
     return *this;
 }
-Menu& Menu::load(const JsonFwd& jf) {
+Menu& Menu::load(const JsonRef jf) {
     const nlohmann::json& j = jf;
     foreach_if_exists("buttons")       _buttons.push_back(Button().load(elem));
     return *this;

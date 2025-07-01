@@ -31,7 +31,7 @@ struct Vec2 {
     operator Vector2() const;
 
     // (De)Serialization
-    Vec2& load(const JsonFwd& jf, const std::string field, const float def=0);
+    Vec2& load(const JsonRef jf, const std::string field, const float def=0);
     template <class Archive>
     void serialize(Archive& ar) { ar(x, y); };
 };
@@ -45,7 +45,7 @@ struct Loadout {
     std::array<Technique, 4> moveset;
 
     // (De)Serialization
-    Loadout& load(const JsonFwd& jf);
+    Loadout& load(const JsonRef jf);
     template <class Archive>
     void serialize(Archive& ar) { ar(head, torso, hands, legs, weapon, moveset); };
 };
@@ -60,7 +60,7 @@ struct ControlScheme {
     KeyboardKey_ reset;
 
     // (De)Serialization
-    ControlScheme& load(const JsonFwd& jf);
+    ControlScheme& load(const JsonRef jf);
     template <class Archive>
     void serialize(Archive& ar) { ar(move, nav, jump, select, pause, reset); };
 };
@@ -70,7 +70,7 @@ struct Profile {
     unlock_map<Technique> moves;
 
     // (De)Serialization
-    Profile& load(const JsonFwd& jf);
+    Profile& load(const JsonRef jf);
     template <class Archive>
     void serialize(Archive& ar) { ar(equipment, moves); };
 };
@@ -80,7 +80,7 @@ struct Action {
     u_int8_t index;
 
     // (De)Serialization
-    Action& load(const JsonFwd& jf);
+    Action& load(const JsonRef jf);
     template <class Archive>
     void serialize(Archive& ar) { ar(type, index); };
 };

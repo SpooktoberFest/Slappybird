@@ -22,7 +22,7 @@ public:
     std::vector<Action> _actions = {{ActionType::LOAD_WORLD, 0}};
 
     // (De)Serialization
-    Scene& load(const JsonFwd& jf);
+    Scene& load(const JsonRef jf);
     template <class Archive>
     void serialize(Archive& ar) {
         ar(_world, _cam_vel, _cam_pos, _score);
@@ -34,7 +34,7 @@ struct Menu {
     u_int8_t _selected;
 
     // (De)Serialization
-    Menu& load(const JsonFwd& jf);
+    Menu& load(const JsonRef jf);
     template <class Archive>
     void serialize(Archive& ar) {
         ar(_buttons);

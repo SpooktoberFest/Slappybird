@@ -7,7 +7,7 @@
 // Forward declarations
 
 // nlohmann::json
-struct JsonFwd;
+struct JsonRef;
 
 // SuperFlappy structs
 struct Spawner;

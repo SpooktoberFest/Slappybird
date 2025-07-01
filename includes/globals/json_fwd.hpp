@@ -3,8 +3,8 @@
 
 #include "nlohmann/json.hpp"
 
-struct JsonFwd {
-    JsonFwd(const nlohmann::json& j_) : j(j_) {};
+struct JsonRef {
+    JsonRef(const nlohmann::json& j_) : j(j_) {};
     operator const nlohmann::json&() const { return j; }
 private:
     const nlohmann::json& j;

@@ -223,8 +223,7 @@ void Game::handle_collision() {
 
 void Game::handle_action(const Action& action) {
     // Other Actions
-    switch (action.type)
-    {
+    switch (action.type) {
     case ActionType::EXIT_GAME:
         _gamestate = QUIT;
         break;
@@ -232,7 +231,7 @@ void Game::handle_action(const Action& action) {
         LOG_WARN(src, "Unknown ActionType: " + std::to_string(action.type));
         break;
     }
-    
+
     _scene._actions.push_back(action);
 }
 

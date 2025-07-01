@@ -2,6 +2,8 @@
 #define SUPERFLAPPY_ENTITIES_HPP
 
 #include <string>
+#include <vector>
+#include <optional>
 
 #include <cereal/types/string.hpp>
 #include <cereal/types/vector.hpp>
@@ -18,7 +20,7 @@ struct Chararacter {
     Rectangle rect(float w=1_b, float h=1_b) const;
 
     // (De)Serialization
-    Chararacter& load(const JsonFwd& jf);
+    Chararacter& load(const JsonRef jf);
     template <class Archive>
     void serialize(Archive& ar) { ar(vel, pos); }
 };
@@ -30,7 +32,7 @@ struct Pipe {
     std::array<Rectangle, 2> rect(const float w, const float h) const;
 
     // (De)Serialization
-    Pipe& load(const JsonFwd& jf);
+    Pipe& load(const JsonRef jf);
     template <class Archive>
     void serialize(Archive& ar) { ar(pos);};
 };
@@ -42,7 +44,7 @@ struct Platform {
     Rectangle rect() const;
 
     // (De)Serialization
-    Platform& load(const JsonFwd& jf);
+    Platform& load(const JsonRef jf);
     template <class Archive>
     void serialize(Archive& ar) { ar(pos, size); }
 };
@@ -57,7 +59,7 @@ struct Button {
     Rectangle rect(const Vector2& res) const;
 
     // (De)Serialization
-    Button& load(const JsonFwd& jf);
+    Button& load(const JsonRef jf);
     template <class Archive>
     void serialize(Archive& ar) { ar(pos, size, text, action, parameter); }
 };
@@ -74,7 +76,7 @@ struct Biome {
     float jump_strength = -8.0f;
 
     // (De)Serialization
-    Biome& load(const JsonFwd& jf);
+    Biome& load(const JsonRef jf);
     template <class Archive>
     void serialize(Archive& ar) {
         ar( pos, pipe_width, gap_height, pipe_speed,
@@ -92,7 +94,7 @@ struct World {
     std::vector<Biome> biomes;
 
     // (De)Serialization
-    World& load(const JsonFwd& jf);
+    World& load(const JsonRef jf);
     template <class Archive>
     void serialize(Archive& ar) {
         ar(player, enemies, spawners, pipes, buttons, platforms, biomes);
@@ -102,6 +104,7 @@ struct World {
 struct Spawner {
     Vec2 pos;
     Vec2 vel;
+
     Action predicate;
     bool use_index;
     World spawn_in;
@@ -109,9 +112,9 @@ struct Spawner {
     bool check_predicate(const Game& context) const;
 
     // (De)Serialization
-    Spawner& load(const JsonFwd& jf);
+    Spawner& load(const JsonRef jf);
     template <class Archive>
-    void serialize(Archive& ar) { ar(vel, pos, predicate, use_index, spawn_in); }
+    void serialize(Archive& ar) { ar(vel, pos, predicate, use_index, spawn_in, spawn); }
 };
 
 

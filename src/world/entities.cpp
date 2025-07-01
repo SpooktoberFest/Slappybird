@@ -45,24 +45,24 @@ Rectangle Button::rect(const Vector2& res) const {
 
 // Load() functions
 
-Chararacter& Chararacter::load(const JsonFwd& jf) {
+Chararacter& Chararacter::load(const JsonRef jf) {
     const nlohmann::json& j = jf;
     pos.load(j, "pos");
     vel.load(j, "vel");
     return *this;
 }
-Pipe& Pipe::load(const JsonFwd& jf) {
+Pipe& Pipe::load(const JsonRef jf) {
     const nlohmann::json& j = jf;
     pos.load(j, "pos");
     return *this;
 }
-Platform& Platform::load(const JsonFwd& jf) {
+Platform& Platform::load(const JsonRef jf) {
     const nlohmann::json& j = jf;
     pos.load(j, "pos");
     size.load(j, "size", 1_b);
     return *this;
 }
-Button& Button::load(const JsonFwd& jf) {
+Button& Button::load(const JsonRef jf) {
     const nlohmann::json& j = jf;
     pos.load(j, "pos");
     size.load(j, "size", 1_b);
@@ -72,7 +72,7 @@ Button& Button::load(const JsonFwd& jf) {
     text = j.value("text", "");
     return *this;
 }
-Biome& Biome::load(const JsonFwd& jf) {
+Biome& Biome::load(const JsonRef jf) {
     const nlohmann::json& j = jf;
     pipe_width = j.value("pipe_width", pipe_width);
     gap_height = j.value("gap_height", gap_height);
@@ -82,7 +82,7 @@ Biome& Biome::load(const JsonFwd& jf) {
     move_speed = j.value("move_speed", move_speed);
     return *this;
 }
-World& World::load(const JsonFwd& jf) {
+World& World::load(const JsonRef jf) {
     const nlohmann::json& j = jf;
     if (j.count("player"))  player = Chararacter().load(j["player"]);
     foreach_if_exists("enemies")    enemies.push_back(Chararacter().load(elem));
@@ -93,7 +93,7 @@ World& World::load(const JsonFwd& jf) {
     foreach_if_exists("biomes")     biomes.push_back(Biome().load(elem));
     return *this;
 }
-Spawner& Spawner::load(const JsonFwd& jf) {
+Spawner& Spawner::load(const JsonRef jf) {
     const nlohmann::json& j = jf;
     pos.load(j, "pos");
     vel.load(j, "vel");
