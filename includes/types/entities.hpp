@@ -91,6 +91,7 @@ struct ButtonList {
     float pos, spacing, begin, end;
     Vec2 button_dims = {1_b, 1_b};
 
+    void clamp();
     std::vector<Rectangle> rects(const Vector2& res) const;
 
     // (De)Serialization
@@ -104,6 +105,8 @@ struct ButtonList {
 struct Menu {
     std::vector<ButtonList> buttons;
     u_int8_t index;
+
+    void clamp();
 
     // (De)Serialization
     Menu& load(const JsonRef jf);

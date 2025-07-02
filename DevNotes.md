@@ -3,16 +3,16 @@
 # To do:
 
 Now:
-- Menu columns
+- Gamestate use flags
 - Spawners
 
-- Create Basic Scenes
 
 
 ----
 
 
 Soon:
+- Create Basic Scenes
 - Basic Enemies
 - Biomes
 - Basic Attack
@@ -63,9 +63,6 @@ Context:
 
 'What':
 - Any Entities (through constructor)
-
-
-
 
 
 

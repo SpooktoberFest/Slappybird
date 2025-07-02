@@ -43,16 +43,6 @@ private:
     void set_background(OptColor color1, OptColor color2);
     void update_resolution(const bool override=false);
 
-
-    template<typename T>
-    void clamp(T& menu) {
-        menu.index = branchless_ternary(
-            (menu.index < 200),
-            menu.index % menu.buttons.size(),
-            u_int8_t(menu.buttons.size() + menu.index)
-        );
-    }
-
     // Handlers
     void handle_collision();
     void handle_input();

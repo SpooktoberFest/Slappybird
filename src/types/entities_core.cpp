@@ -41,6 +41,24 @@ Scene::Scene() {
 };
 
 
+void Menu::clamp() {
+    if (buttons.empty()) return;
+    index = branchless_ternary(
+        (index < 200),
+        index % buttons.size(),
+        u_int8_t(buttons.size() + index)
+    );
+}
+void ButtonList::clamp() {
+    if (buttons.empty()) return;
+    index = branchless_ternary(
+        (index < 200),
+        index % buttons.size(),
+        u_int8_t(buttons.size() + index)
+    );
+}
+
+
 bool Spawner::check_predicate(const Game& context) const {
     const std::vector<Action>& actions = context.get_scene()._actions;
     return (
@@ -73,8 +91,6 @@ std::vector<Rectangle> ButtonList::rects(const Vector2& res) const {
     }
     return rects;
 };
-
-// Rect functions
 
 Rectangle Chararacter::rect(float w, float h) const {
     return Rectangle{pos.x, pos.y, std::move(w), std::move(h)};

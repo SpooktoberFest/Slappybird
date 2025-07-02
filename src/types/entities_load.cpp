@@ -55,11 +55,11 @@ Button& Button::load(const JsonRef jf) {
 ButtonList& ButtonList::load(const JsonRef jf) {
     const nlohmann::json& j = jf;
     foreach_if_exists("buttons")       buttons.push_back(Button().load(elem));
-    horizontal = j.value("horizontal", horizontal);
-    pos = j.value("pos", pos);
-    spacing = j.value("spacing", spacing);
-    begin = j.value("begin", begin);
-    end = j.value("end", end);
+    horizontal = j.value("horizontal", false);
+    pos = j.value("pos", 0) * BLOCK;
+    spacing = j.value("spacing", 0) * BLOCK;
+    begin = j.value("begin", 0) * BLOCK;
+    end = j.value("end", 15) * BLOCK;
     button_dims.load(j, "button_dims", 1_b);
     return *this;
 }

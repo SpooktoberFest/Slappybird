@@ -7,7 +7,7 @@
 
 #include "raylib.h"
 
-const static auto src = "Game";
+const static auto src = "GameHandlers";
 
 
 void Game::handle_entitysim() {
@@ -99,20 +99,32 @@ void Game::handle_input() {
         case GameState::RUNNING:
             _gamestate = GameState::PAUSED; break;
         case GameState::GAMEOVER:
-            _gamestate = GameState::PAUSED_GAMEOVER; break;
+            if (_menus.size() > 1U) _menus.pop();
+            else _gamestate = GameState::PAUSED_GAMEOVER; break;
         case GameState::PAUSED_GAMEOVER:
-            _gamestate = GameState::GAMEOVER; break;
+            if (_menus.size() > 1U) _menus.pop();
+            else _gamestate = GameState::GAMEOVER; break;
         default: break;
         }
     }
 
     // Mouse & Buttons
-    if ((_gamestate == GameState::PAUSED ? bool(_menus.size()) : bool(_scene._world.menu))) {
-        
+    if (_gamestate == GameState::PAUSED ?
+        bool(!_menus.empty() && !_menus.top().buttons.empty()) :
+        bool(_scene._world.menu && !_scene._world.menu->buttons.empty())) {
+
+        // LOG_DEBUG(src,
+        //     "\n\n\n  Game paused: " + std::to_string(_gamestate == GameState::PAUSED) + 
+        //     ", Pause menus exist: " + std::to_string(!_menus.empty()) + 
+        //     ", World menus exist: " + std::to_string(_scene._world.menu == std::nullopt));
+
         const bool paused = bool(_gamestate == GameState::PAUSED);
         Menu& smenu = paused ? _menus.top() : *_scene._world.menu;
 
-        {   // Navigation keys
+
+        // Navigation keys
+        {
+            smenu.clamp();
             ButtonList* sblist = &smenu.buttons[smenu.index];
             u_int8_t nav_x = IsKeyPressed(_controls.nav[RIGHT]) - IsKeyPressed(_controls.nav[LEFT]);
             u_int8_t nav_y = IsKeyPressed(_controls.nav[DOWN]) - IsKeyPressed(_controls.nav[UP]);
@@ -120,8 +132,8 @@ void Game::handle_input() {
 
             sblist->index += nav_y;
             smenu.index += nav_x;
-            clamp(*sblist);
-            clamp(smenu);
+            sblist->clamp();
+            smenu.clamp();
 
             if (nav_y != 0) {
                 // Update selected button list
@@ -135,7 +147,7 @@ void Game::handle_input() {
                     sblist->index
                 );
                 // Clamp new button list
-                clamp(*sblist);
+                sblist->clamp();
             }
         }
 
@@ -151,6 +163,7 @@ void Game::handle_input() {
                     hit = true;
                     smenu.index = i;
                     smenu.buttons[i].index = j;
+
                     // Mouse click
                     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
                         handle_action(smenu.buttons[i].buttons[j].action);
@@ -158,11 +171,14 @@ void Game::handle_input() {
                 }
             }
         }
+
         // Select key
         if (IsKeyPressed(_controls.select)) {
-            handle_action(smenu.buttons[i].buttons[j].action);
+            const ButtonList& sblist = smenu.buttons[smenu.index];
+            handle_action(sblist.buttons[sblist.index].action);
         }
     }
+
 
     if (_gamestate > GameState::RUNNING) return;
 
