@@ -4,6 +4,7 @@
 
 #include "raylib.h"
 
+#include "debug.hpp"
 #include "utils.hpp"
 #include "json_fwd.hpp"
 #include "game.hpp"
@@ -44,16 +45,16 @@ Scene::Scene() {
 void Menu::clamp() {
     if (buttons.empty()) return;
     index = branchless_ternary(
-        (index < 200),
-        index % buttons.size(),
+        u_int8_t(index < 200),
+        u_int8_t(index % buttons.size()),
         u_int8_t(buttons.size() + index)
     );
 }
 void ButtonList::clamp() {
     if (buttons.empty()) return;
     index = branchless_ternary(
-        (index < 200),
-        index % buttons.size(),
+        u_int8_t(index < 200),
+        u_int8_t(index % buttons.size()),
         u_int8_t(buttons.size() + index)
     );
 }
@@ -73,13 +74,20 @@ bool Spawner::check_predicate(const Game& context) const {
     );
 }
 
+void ButtonList::load_buttons(const std::vector<std::string>& str_vec, ActionType type) {
+    buttons.clear();
+    for (std::size_t i=0 ; i < str_vec.size() ; ++i)
+        buttons.push_back(Button{str_vec[i], Action{type, u_int8_t(i)}});
+}
+
+
 // Rect functions
 std::vector<Rectangle> ButtonList::rects(const Vector2& res) const {
     std::vector<Rectangle> rects;
-    const float offset = pos < 0.0f ? (horizontal ? res.x : res.y) : 0.0f;
+    const float offset = pos < 0.0f ? (horizontal ? res.y : res.x) : 0.0f;
     Rectangle rect = {
-        horizontal ? spacing : pos + offset,
-        horizontal ? pos + offset : spacing,
+        horizontal ? begin : pos + offset,
+        horizontal ? pos + offset : begin,
         button_dims.x,
         button_dims.y
     };

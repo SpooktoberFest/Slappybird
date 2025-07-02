@@ -76,12 +76,11 @@ struct Biome {
 struct Button {
     std::string text;
     Action action;
-    int parameter;
 
     // (De)Serialization
     Button& load(const JsonRef jf);
     template <class Archive>
-    void serialize(Archive& ar) { ar(text, action, parameter); }
+    void serialize(Archive& ar) { ar(text, action); }
 };
 
 struct ButtonList {
@@ -90,15 +89,17 @@ struct ButtonList {
     bool horizontal = false;
     float pos, spacing, begin, end;
     Vec2 button_dims = {1_b, 1_b};
+    Type special_content = Type::NONE;
 
     void clamp();
+    void load_buttons(const std::vector<std::string>& str_vec, const ActionType type);
     std::vector<Rectangle> rects(const Vector2& res) const;
 
     // (De)Serialization
     ButtonList& load(const JsonRef jf);
     template <class Archive>
     void serialize(Archive& ar) {
-        ar(buttons, horizontal, pos, spacing, begin, end, button_dims);
+        ar(buttons, horizontal, pos, spacing, begin, end, button_dims, special_content);
     }
 };
 
@@ -159,7 +160,7 @@ public:
     Vec2 _cam_vel; // Where QNAN means follow player
     Vec2 _cam_pos;
     u_int16_t _score = 0;
-    std::vector<Action> _actions = {{ActionType::LOAD_WORLD, 0}};
+    std::vector<Action> _actions = {{ActionType::LOAD_WORLD}};
 
     // (De)Serialization
     Scene& load(const JsonRef jf);

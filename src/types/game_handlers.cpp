@@ -173,8 +173,10 @@ void Game::handle_input() {
         }
 
         // Select key
-        if (IsKeyPressed(_controls.select)) {
+        if (IsKeyPressed(_controls.select)) {            
+            LOG_DEBUG(src, "smenu.index: " + std::to_string(smenu.index));
             const ButtonList& sblist = smenu.buttons[smenu.index];
+            LOG_DEBUG(src, "sblist.index: " + std::to_string(sblist.index));
             handle_action(sblist.buttons[sblist.index].action);
         }
     }
@@ -270,8 +272,31 @@ void Game::handle_collision() {
 void Game::handle_action(const Action& action) {
     // Other Actions
     switch (action.type) {
+    case ActionType::LOAD_WORLD:
+        LOG_INFO(src, "Loaded World");
+        break;
     case ActionType::EXIT_GAME:
-        _gamestate = QUIT;
+        LOG_INFO(src, "Exiting Game");
+        _gamestate = QUIT; break;
+
+    case ActionType::SHOW_PROFILES: {
+        LOG_INFO(src, "Fetching Profiles");
+        const auto profile_names = _serializer.get_files(_serializer.profiles_path, ".profile");
+        if (_scene._world.menu)
+            for (auto& blist : _scene._world.menu->buttons)
+            if (blist.special_content == Type::PROFILE)
+            blist.load_buttons(profile_names, ActionType::LOAD_PROFILE);
+        if (!_menus.empty())
+            for (auto& blist : _menus.top().buttons)
+            if (blist.special_content == Type::PROFILE)
+            blist.load_buttons(profile_names, ActionType::LOAD_PROFILE);
+        } break;
+
+    case ActionType::LOAD_PROFILE:
+        LOG_INFO(src, "Loading Profile");
+        _serializer.loadProfile(
+            _serializer.get_files(_serializer.profiles_path, ".profile")[action.index],
+            &_profile);
         break;
     default:
         LOG_WARN(src, "Unknown ActionType: " + std::to_string(action.type));

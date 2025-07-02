@@ -3,6 +3,7 @@
 #include "algorithm"
 
 #include "utils.hpp"
+#include "debug.hpp"
 #include "json_fwd.hpp"
 
 
@@ -48,7 +49,6 @@ Button& Button::load(const JsonRef jf) {
     const nlohmann::json& j = jf;
     action.type = j.value("action_type", ActionType::NOP);
     action.index = j.value("action_index", 0);
-    parameter = j.value("parameter", 0);
     text = j.value("text", "");
     return *this;
 }
@@ -56,10 +56,11 @@ ButtonList& ButtonList::load(const JsonRef jf) {
     const nlohmann::json& j = jf;
     foreach_if_exists("buttons")       buttons.push_back(Button().load(elem));
     horizontal = j.value("horizontal", false);
-    pos = j.value("pos", 0) * BLOCK;
-    spacing = j.value("spacing", 0) * BLOCK;
-    begin = j.value("begin", 0) * BLOCK;
-    end = j.value("end", 15) * BLOCK;
+    special_content = j.value("special_content", Type::NONE);
+    pos = j.value("pos", 0.0f) * BLOCK;
+    spacing = j.value("spacing", 0.0f) * BLOCK;
+    begin = j.value("begin", 0.0f) * BLOCK;
+    end = j.value("end", 15.0f) * BLOCK;
     button_dims.load(j, "button_dims", 1_b);
     return *this;
 }

@@ -52,6 +52,7 @@ private:
 
     // Game State
     Scene _scene;
+    Profile _profile;
     std::stack<Menu> _menus;
     GameState _gamestate = GameState::INIT;
 

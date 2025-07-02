@@ -28,9 +28,11 @@ public:
     const static std::string scenes_path;
     const static std::string profiles_path;
 
+    std::vector<std::string> get_files(const std::string& path, const std::string type);
+
+
 private:
 
-    std::vector<std::string> get_files(const int start_index, const std::string& path, std::string type);
 
     // std::optional<Scene> fetch_scene(const std::string& name, bool custom);
     // void send_scene(const std::string& name, bool custom);

@@ -133,9 +133,6 @@ bool Serializer::devModeLoad(std::string path) {
         for (const auto& j : data["menus"]) {
             ++total;
             try {
-                // Here check for tag
-                // If tag exists, load profiles or something
-
                 Menu menu = Menu().load(j["data"]);
                 saveMenu(j["name"], &menu);
             } catch (const std::exception& e) {
@@ -165,7 +162,7 @@ bool Serializer::devModeLoad(std::string path) {
 }
 
 
-std::vector<std::string> Serializer::get_files(const int start_index, const std::string& path, std::string type) {
+std::vector<std::string> Serializer::get_files(const std::string& path, const std::string type) {
     std::vector<std::string> matched_files;
 
     try {

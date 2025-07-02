@@ -24,7 +24,7 @@ Game::Game() {
 
     LOG_INFO(src, "Initialized Raylib Components");
 
-    _serializer.loadScene("main_menu.scene");
+    _serializer.loadScene("profile_select.scene");
     {
         Menu menu;
         _serializer.loadMenu("pause.menu", &menu);
@@ -161,6 +161,7 @@ void Game::set_background(OptColor color1, OptColor color2) {
 void Game::reset_scene(const Scene* scene) {
     if (scene) _serializer.loaded_scene = *scene;
     _scene = _serializer.loaded_scene;
+    handle_action({ActionType::SHOW_PROFILES});
 }
 
 bool Game::is_quit() const {

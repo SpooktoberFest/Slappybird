@@ -41,13 +41,32 @@ enum class Technique : u_int16_t {
     MEN, DO, KOTE
 };
 
-enum class Entity : u_int8_t {
+enum class Type : u_int8_t {
+    NONE,
+
+    PROPERTY,
+    VECTOR,
+    LOADOUT,
+    CONTROLSHEME,
+    PROFILE,
+    ACTION,
+
+
+    ENTITY,
+    CHARACTER,
     PLAYER,
     ENEMY,
     PIPE,
     PLATFORM,
+    BIOME,
     BUTTON,
-    SPAWNER
+    BUTTONLIST,
+    MENU,
+    WORLD,
+    SPAWNER,
+    SCENE,
+
+    GAME
 };
 
 
