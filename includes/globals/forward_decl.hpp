@@ -11,6 +11,7 @@ struct JsonRef;
 
 // SuperFlappy structs
 struct Spawner;
+struct Menu;
 struct Game;
 struct World;
 

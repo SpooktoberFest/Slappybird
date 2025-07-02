@@ -9,8 +9,10 @@
 #include <cereal/types/vector.hpp>
 #include <cereal/types/optional.hpp>
 
+#include "utils.hpp"
 #include "forward_decl.hpp"
 #include "properties.hpp"
+
 
 
 struct Chararacter {
@@ -24,6 +26,7 @@ struct Chararacter {
     template <class Archive>
     void serialize(Archive& ar) { ar(vel, pos); }
 };
+
 
 struct Pipe {
     Vec2 pos;
@@ -49,21 +52,6 @@ struct Platform {
     void serialize(Archive& ar) { ar(pos, size); }
 };
 
-struct Button {
-    Vec2 pos;
-    Vec2 size;
-    std::string text;
-    Action action;
-    int parameter;
-
-    Rectangle rect(const Vector2& res) const;
-
-    // (De)Serialization
-    Button& load(const JsonRef jf);
-    template <class Archive>
-    void serialize(Archive& ar) { ar(pos, size, text, action, parameter); }
-};
-
 struct Biome {
     Vec2 pos;
 
@@ -84,12 +72,53 @@ struct Biome {
     }
 };
 
+
+struct Button {
+    std::string text;
+    Action action;
+    int parameter;
+
+    // (De)Serialization
+    Button& load(const JsonRef jf);
+    template <class Archive>
+    void serialize(Archive& ar) { ar(text, action, parameter); }
+};
+
+struct ButtonList {
+    std::vector<Button> buttons;
+    u_int8_t index = 0;
+    bool horizontal = false;
+    float pos, spacing, begin, end;
+    Vec2 button_dims = {1_b, 1_b};
+
+    std::vector<Rectangle> rects(const Vector2& res) const;
+
+    // (De)Serialization
+    ButtonList& load(const JsonRef jf);
+    template <class Archive>
+    void serialize(Archive& ar) {
+        ar(buttons, horizontal, pos, spacing, begin, end, button_dims);
+    }
+};
+
+struct Menu {
+    std::vector<ButtonList> buttons;
+    u_int8_t index;
+
+    // (De)Serialization
+    Menu& load(const JsonRef jf);
+    template <class Archive>
+    void serialize(Archive& ar) {
+        ar(buttons);
+    }
+};
+
 struct World {
     std::optional<Chararacter> player;
+    std::optional<Menu> menu;
     std::vector<Chararacter> enemies;
     std::vector<Spawner> spawners;
     std::vector<Pipe> pipes;
-    std::vector<Button> buttons;
     std::vector<Platform> platforms;
     std::vector<Biome> biomes;
 
@@ -97,9 +126,10 @@ struct World {
     World& load(const JsonRef jf);
     template <class Archive>
     void serialize(Archive& ar) {
-        ar(player, enemies, spawners, pipes, buttons, platforms, biomes);
+        ar(player, menu, enemies, spawners, pipes, platforms, biomes);
     }
 };
+
 
 struct Spawner {
     Vec2 pos;
@@ -114,8 +144,28 @@ struct Spawner {
     // (De)Serialization
     Spawner& load(const JsonRef jf);
     template <class Archive>
-    void serialize(Archive& ar) { ar(vel, pos, predicate, use_index, spawn_in, spawn); }
+    void serialize(Archive& ar) { ar(pos, vel, predicate, use_index, spawn_in); }
 };
+
+class Scene {
+public:
+    Scene();
+    virtual ~Scene() {};
+
+    World _world;
+    Vec2 _cam_vel; // Where QNAN means follow player
+    Vec2 _cam_pos;
+    u_int16_t _score = 0;
+    std::vector<Action> _actions = {{ActionType::LOAD_WORLD, 0}};
+
+    // (De)Serialization
+    Scene& load(const JsonRef jf);
+    template <class Archive>
+    void serialize(Archive& ar) {
+        ar(_world, _cam_vel, _cam_pos, _score);
+    }
+};
+
 
 
 

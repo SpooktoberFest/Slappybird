@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-#include "operators.hpp"
+#include "utils.hpp"
 #include "debug.hpp"
 
 #include "raylib.h"
@@ -78,26 +78,36 @@ void Game::render() {
     }
 
     // Scene Buttons
-    for (const auto& button : _scene._world.buttons) {
-            const auto hitbox = button.rect(_res);
-            DrawRectangleRec(hitbox, (is_running ? WHITE : GRAY));
-            DrawText(button.text.c_str(), hitbox.x + 5, hitbox.y + 5, 20, DARKGRAY);
-    }
-    if (is_running) {
-        if (_scene._selected < _scene._world.buttons.size())
-            DrawRectangleLinesEx(_scene._world.buttons[_scene._selected].rect(_res), 5.0f, YELLOW);
+    if (_scene._world.menu) {
+        std::size_t i, j;
+        for (i=0 ; i < _scene._world.menu->buttons.size() ; ++i) {
+            const ButtonList& button_list = _scene._world.menu->buttons[i];
+            const auto hitboxes = button_list.rects(_res);
+            for (j=0 ; j < hitboxes.size() ; ++j) {
+                const Rectangle hitbox = hitboxes[j];
+                DrawRectangleRec(hitbox, (is_running ? WHITE : GRAY));
+                DrawText(button_list.buttons[j].text.c_str(), hitbox.x + 5, hitbox.y + 5, 20, DARKGRAY);
+            }
+            if (_scene._world.menu->index == i && is_running)
+                DrawRectangleLinesEx(hitboxes[j], 5.0f, YELLOW);
+        }
     }
 
     // Menu Buttons
-    else {
+    if (!is_running && _menus.size()) {
         const Menu& menu = _menus.top();
-        for (const auto& button : menu._buttons) {
-            const auto hitbox = button.rect(_res);
-            DrawRectangleRec(hitbox, WHITE);
-            DrawText(button.text.c_str(), hitbox.x + 5, hitbox.y + 5, 20, DARKGRAY);
+        std::size_t i, j;
+        for (i=0 ; i < menu.buttons.size() ; ++i) {
+            const ButtonList& button_list = menu.buttons[i];
+            const auto hitboxes = button_list.rects(_res);
+            for (j=0 ; j < hitboxes.size() ; ++j) {
+                const Rectangle hitbox = hitboxes[j];
+                DrawRectangleRec(hitbox, WHITE);
+                DrawText(button_list.buttons[j].text.c_str(), hitbox.x + 5, hitbox.y + 5, 20, DARKGRAY);
+            }
+            if (menu.index == i && is_running)
+                DrawRectangleLinesEx(hitboxes[j], 5.0f, YELLOW);
         }
-        if (menu._selected < menu._buttons.size())
-            DrawRectangleLinesEx(menu._buttons[menu._selected].rect(_res), 5.0f, YELLOW);
     }
 
     // Player

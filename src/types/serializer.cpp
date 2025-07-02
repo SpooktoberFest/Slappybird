@@ -133,6 +133,9 @@ bool Serializer::devModeLoad(std::string path) {
         for (const auto& j : data["menus"]) {
             ++total;
             try {
+                // Here check for tag
+                // If tag exists, load profiles or something
+
                 Menu menu = Menu().load(j["data"]);
                 saveMenu(j["name"], &menu);
             } catch (const std::exception& e) {

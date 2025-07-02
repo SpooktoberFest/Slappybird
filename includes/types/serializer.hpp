@@ -1,7 +1,7 @@
 #ifndef SUPERFLAPPY_SERIALIZER_HPP
 #define SUPERFLAPPY_SERIALIZER_HPP
 
-#include "scene.hpp"
+#include "entities.hpp"
 #include "properties.hpp"
 
 class Serializer {
@@ -19,7 +19,6 @@ public:
     bool loadMenu(std::string name, Menu* menu_opt=nullptr);
 
     bool devModeLoad(std::string path);
-    std::vector<std::string> get_files(const int start_index, const std::string& path, std::string type);
 
 
     Scene loaded_scene;
@@ -30,6 +29,8 @@ public:
     const static std::string profiles_path;
 
 private:
+
+    std::vector<std::string> get_files(const int start_index, const std::string& path, std::string type);
 
     // std::optional<Scene> fetch_scene(const std::string& name, bool custom);
     // void send_scene(const std::string& name, bool custom);

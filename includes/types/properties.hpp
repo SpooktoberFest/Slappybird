@@ -2,32 +2,18 @@
 #define SUPERFLAPPY_PROPERTIES_HPP
 
 #include <array>
-#include <limits>
-
 #include <cereal/types/array.hpp>
 
 #include "forward_decl.hpp"
 #include "unlock_map.hpp"
 #include "enums.hpp"
 
-#define QNAN std::numeric_limits<float>::quiet_NaN()
-#define BLOCK 32.0f
-
-
-// Literal for block unit
-constexpr float operator"" _b(unsigned long long value) {
-    return static_cast<float>(value) * BLOCK;
-}
 
 struct Vec2 {
     float x;
     float y;
 
-    Vec2& emplace(const Vec2& other) {
-        if (x == QNAN) x = other.x;
-        if (y == QNAN) y = other.y;
-        return *this;
-    }
+    Vec2& emplace(const Vec2& other);
     operator Vector2() const;
 
     // (De)Serialization

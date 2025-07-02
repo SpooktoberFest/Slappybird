@@ -5,11 +5,11 @@
 #include <array>
 #include <stack>
 
+#include "utils.hpp"
 #include "forward_decl.hpp"
 #include "properties.hpp"
-#include "scene.hpp"
+#include "entities.hpp"
 #include "serializer.hpp"
-
 
 
 class Game {
@@ -42,6 +42,16 @@ private:
     void reset_scene(const Scene* scene=nullptr);
     void set_background(OptColor color1, OptColor color2);
     void update_resolution(const bool override=false);
+
+
+    template<typename T>
+    void clamp(T& menu) {
+        menu.index = branchless_ternary(
+            (menu.index < 200),
+            menu.index % menu.buttons.size(),
+            u_int8_t(menu.buttons.size() + menu.index)
+        );
+    }
 
     // Handlers
     void handle_collision();

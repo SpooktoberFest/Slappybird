@@ -19,8 +19,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin)
 add_executable(${EXECUTABLE_NAME} ${SOURCES})
 
 target_include_directories(${EXECUTABLE_NAME} PRIVATE
-    ${CMAKE_SOURCE_DIR}/includes/containers
-    ${CMAKE_SOURCE_DIR}/includes/world
+    ${CMAKE_SOURCE_DIR}/includes/types
     ${CMAKE_SOURCE_DIR}/includes/globals
     ${CMAKE_SOURCE_DIR}/third_party
     /usr/local/include/json/single_include/nlohmann/

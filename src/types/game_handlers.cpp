@@ -2,12 +2,11 @@
 
 #include <cmath>
 
-#include "operators.hpp"
+#include "utils.hpp"
 #include "debug.hpp"
 
 #include "raylib.h"
 
-#define branchless_ternary(pred, a, b) (a & -pred) | (b & ~-pred)
 const static auto src = "Game";
 
 
@@ -43,7 +42,15 @@ void Game::handle_spawning() {
     for (const auto& spawner : _scene._world.spawners) {
         if (spawner.check_predicate(*this)) {
             World spawn_in = spawner.spawn_in;
-
+            // Optionals
+            if (spawn_in.player) {
+                spawn_in.player->pos.emplace(spawner.pos);
+                _scene._world.player = *spawn_in.player;
+            }
+            if (spawn_in.menu) {
+                _scene._world.menu = *spawn_in.menu;
+            }
+            // Vectors
             for (auto& spawn : spawn_in.enemies) {
                 spawn.pos.emplace(spawner.pos);
                 _scene._world.enemies.push_back(std::move(spawn));
@@ -55,10 +62,6 @@ void Game::handle_spawning() {
             for (auto& spawn : spawn_in.pipes) {
                 spawn.pos.emplace(spawner.pos);
                 _scene._world.pipes.push_back(std::move(spawn));
-            }
-            for (auto& spawn : spawn_in.buttons) {
-                spawn.pos.emplace(spawner.pos);
-                _scene._world.buttons.push_back(std::move(spawn));
             }
             for (auto& spawn : spawn_in.platforms) {
                 spawn.pos.emplace(spawner.pos);
@@ -104,33 +107,60 @@ void Game::handle_input() {
     }
 
     // Mouse & Buttons
-    if (_scene._world.buttons.size() > 0 || _gamestate == GameState::PAUSED) {
+    if ((_gamestate == GameState::PAUSED ? bool(_menus.size()) : bool(_scene._world.menu))) {
+        
         const bool paused = bool(_gamestate == GameState::PAUSED);
-        auto& index = paused ? _menus.top()._selected : _scene._selected;
-        const auto& buttons = paused ? _menus.top()._buttons : _scene._world.buttons;
+        Menu& smenu = paused ? _menus.top() : *_scene._world.menu;
 
-        // Navigation keys
-        index +=
-            ( IsKeyPressed(_controls.nav[RIGHT])
-            - IsKeyPressed(_controls.nav[LEFT]) ) * 6
-            + IsKeyPressed(_controls.nav[DOWN])
-            - IsKeyPressed(_controls.nav[UP]);
-        index = branchless_ternary((index < 200), index % buttons.size(), u_int8_t(buttons.size() + index));
+        {   // Navigation keys
+            ButtonList* sblist = &smenu.buttons[smenu.index];
+            u_int8_t nav_x = IsKeyPressed(_controls.nav[RIGHT]) - IsKeyPressed(_controls.nav[LEFT]);
+            u_int8_t nav_y = IsKeyPressed(_controls.nav[DOWN]) - IsKeyPressed(_controls.nav[UP]);
+            if (sblist->horizontal) std::swap(nav_x, nav_y);
+
+            sblist->index += nav_y;
+            smenu.index += nav_x;
+            clamp(*sblist);
+            clamp(smenu);
+
+            if (nav_y != 0) {
+                // Update selected button list
+                sblist = &smenu.buttons[smenu.index];
+                // Carry index if they have same orientation
+                const bool same_orientation =
+                    (sblist->horizontal == smenu.buttons[smenu.index].horizontal);
+                sblist->index = branchless_ternary(
+                    same_orientation,
+                    smenu.buttons[smenu.index].index,
+                    sblist->index
+                );
+                // Clamp new button list
+                clamp(*sblist);
+            }
+        }
 
         // Mouse hover
         Vector2 mouse_pos = GetMousePosition();
-        for (u_int8_t i = 0; i < buttons.size(); ++i) {
-            if (CheckCollisionPointRec(mouse_pos, buttons[i].rect(_res))) {
-                index = i;
-                // Mouse click
-                if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
-                    handle_action(buttons[index].action);
-                break;
+        u_int8_t i, j;
+        bool hit = false;
+        for (i=0; !hit && i < smenu.buttons.size(); ++i) {
+            const auto hitboxes = smenu.buttons[i].rects(_res);
+            for (j=0; j < hitboxes.size(); ++j) {
+                const Rectangle& hitbox = hitboxes[j];
+                if (CheckCollisionPointRec(mouse_pos, hitbox)) {
+                    hit = true;
+                    smenu.index = i;
+                    smenu.buttons[i].index = j;
+                    // Mouse click
+                    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+                        handle_action(smenu.buttons[i].buttons[j].action);
+                    break;
+                }
             }
         }
         // Select key
         if (IsKeyPressed(_controls.select)) {
-            handle_action(buttons[index].action);
+            handle_action(smenu.buttons[i].buttons[j].action);
         }
     }
 
