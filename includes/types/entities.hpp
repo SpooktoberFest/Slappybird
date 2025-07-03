@@ -18,7 +18,7 @@ struct Chararacter {
     Vec2 pos;
     Vec2 vel;
 
-    Rectangle rect(float w=1_b, float h=1_b) const;
+    Rectangle rect(float w=1, float h=1) const;
 
     // (De)Serialization
     Chararacter& load(const JsonRef jf);
@@ -41,7 +41,7 @@ struct Pipe {
 
 struct Platform {
     Vec2 pos;
-    Vec2 size {1_b, 1_b};
+    Vec2 size {1, 1};
 
     Rectangle rect() const;
 
@@ -54,8 +54,8 @@ struct Platform {
 struct Biome {
     Vec2 pos;
 
-    float pipe_width = 2_b;
-    float gap_height = 150.0f;
+    float pipe_width = 2;
+    float gap_height = 5;
     float pipe_speed = 3.0f;
 
     float move_speed = 5.0f;
@@ -87,7 +87,7 @@ struct ButtonList {
     uint8_t index = 0;
     bool horizontal = false;
     float pos, spacing, begin, end;
-    Vec2 button_dims = {1_b, 1_b};
+    Vec2 button_dims = {1, 1};
     Type special_content = Type::NONE;
 
     void clamp();

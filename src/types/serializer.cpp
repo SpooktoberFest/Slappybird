@@ -28,7 +28,7 @@ bool Serializer::saveScene(std::string name, Scene* scene_opt) {
         archive(scene_opt ? *scene_opt : loaded_scene);
         return true;
     } catch (const std::exception& e) {
-        LOG_ERROR(src, "Failed to serialize scene: " + std::string(e.what()));
+        LOG_ERROR("Failed to serialize scene: " + std::string(e.what()));
         return false;
     }
 }
@@ -40,7 +40,7 @@ bool Serializer::loadScene(std::string name, Scene* scene_opt) {
         archive(scene_opt ? *scene_opt : loaded_scene);
         return true;
     } catch (const std::exception& e) {
-        LOG_ERROR(src, "Failed to deserialize scene: " + std::string(e.what()));
+        LOG_ERROR("Failed to deserialize scene: " + std::string(e.what()));
         return false;
     }
 }
@@ -53,7 +53,7 @@ bool Serializer::saveProfile(std::string name, Profile* profile_opt) {
         archive(profile_opt ? *profile_opt : loaded_profile);
         return true;
     } catch (const std::exception& e) {
-        LOG_ERROR(src, "Failed to serialize profile: " + std::string(e.what()));
+        LOG_ERROR("Failed to serialize profile: " + std::string(e.what()));
         return false;
     }
 }
@@ -65,7 +65,7 @@ bool Serializer::loadProfile(std::string name, Profile* profile_opt) {
         archive(profile_opt ? *profile_opt : loaded_profile);
         return true;
     } catch (const std::exception& e) {
-        LOG_ERROR(src, "Failed to deserialize profile: " + std::string(e.what()));
+        LOG_ERROR("Failed to deserialize profile: " + std::string(e.what()));
         return false;
     }
 }
@@ -78,7 +78,7 @@ bool Serializer::loadMenu(std::string name, Menu* menu_opt) {
         archive(menu_opt ? *menu_opt : loaded_menu);
         return true;
     } catch (const std::exception& e) {
-        LOG_ERROR(src, "Failed to deserialize menu: " + std::string(e.what()));
+        LOG_ERROR("Failed to deserialize menu: " + std::string(e.what()));
         return false;
     }
 }
@@ -90,24 +90,24 @@ bool Serializer::saveMenu(std::string name, Menu* menu_opt) {
         archive(menu_opt ? *menu_opt : loaded_menu);
         return true;
     } catch (const std::exception& e) {
-        LOG_ERROR(src, "Failed to serialize menu: " + std::string(e.what()));
+        LOG_ERROR("Failed to serialize menu: " + std::string(e.what()));
         return false;
     }
 }
 
 bool Serializer::devModeLoad(std::string path) {
-    LOG_INFO(src, "Translating JSON data...");
+    LOG_INFO("Translating JSON data...");
     nlohmann::json data;
 
     try {
         std::ifstream is(path);
         if (!is) {
-            LOG_ERROR(src, "Failed to load file at path: " + path);
+            LOG_ERROR("Failed to load file at path: " + path);
             return false;
         }
         data = nlohmann::json::parse(is);
     } catch (const std::exception& e) {
-        LOG_ERROR(src, "Failed to parse JSON file: " + std::string(e.what()));
+        LOG_ERROR("Failed to parse JSON file: " + std::string(e.what()));
         return false;
     }
 
@@ -122,7 +122,7 @@ bool Serializer::devModeLoad(std::string path) {
                 Scene scene = Scene().load(j["data"]);
                 saveScene(j["name"], &scene);
             } catch (const std::exception& e) {
-                LOG_ERROR(src, "Failed to parse scene: " + std::string(e.what()));
+                LOG_ERROR("Failed to parse scene: " + std::string(e.what()));
                 ++failures;
             }
         }
@@ -136,7 +136,7 @@ bool Serializer::devModeLoad(std::string path) {
                 Menu menu = Menu().load(j["data"]);
                 saveMenu(j["name"], &menu);
             } catch (const std::exception& e) {
-                LOG_ERROR(src, "Failed to parse menu: " + std::string(e.what()));
+                LOG_ERROR("Failed to parse menu: " + std::string(e.what()));
                 ++failures;
             }
         }
@@ -150,13 +150,13 @@ bool Serializer::devModeLoad(std::string path) {
                 Profile profile = Profile().load(j["data"]);
                 saveProfile(j["name"], &profile);
             } catch (const std::exception& e) {
-                LOG_ERROR(src, "Failed to parse profile: " + std::string(e.what()));
+                LOG_ERROR("Failed to parse profile: " + std::string(e.what()));
                 ++failures;
             }
         }
     }
 
-    LOG_INFO(src, "Finished translating: " + std::to_string(failures) + " failures out of " + std::to_string(total));
+    LOG_INFO("Finished translating: " + std::to_string(failures) + " failures out of " + std::to_string(total));
     return failures == 0;
 
 }
@@ -167,7 +167,7 @@ std::vector<std::string> Serializer::get_files(const std::string& path, const st
 
     try {
         if (!fs::exists(path) || !fs::is_directory(path)) {
-            LOG_ERROR(src, "Invalid path: " + path)
+            LOG_ERROR("Invalid path: " + path)
             return matched_files;
         }
 
@@ -177,7 +177,7 @@ std::vector<std::string> Serializer::get_files(const std::string& path, const st
             }
         }
     } catch (const fs::filesystem_error& e) {
-        LOG_ERROR(src, "Filesystem error: " + std::string(e.what()));
+        LOG_ERROR("Filesystem error: " + std::string(e.what()));
     }
 
     return matched_files;

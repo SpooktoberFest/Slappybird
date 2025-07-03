@@ -31,7 +31,7 @@ Pipe& Pipe::load(const JsonRef jf) {
 Platform& Platform::load(const JsonRef jf) {
     const nlohmann::json& j = jf;
     pos.load(j, "pos");
-    size.load(j, "size", 1_b);
+    size.load(j, "size", 1);
     return *this;
 }
 Biome& Biome::load(const JsonRef jf) {
@@ -57,11 +57,11 @@ ButtonList& ButtonList::load(const JsonRef jf) {
     foreach_if_exists("buttons")       buttons.push_back(Button().load(elem));
     horizontal = j.value("horizontal", false);
     special_content = j.value("special_content", Type::NONE);
-    pos = j.value("pos", 0.0f) * BLOCK;
-    spacing = j.value("spacing", 0.0f) * BLOCK;
-    begin = j.value("begin", 0.0f) * BLOCK;
-    end = j.value("end", 15.0f) * BLOCK;
-    button_dims.load(j, "button_dims", 1_b);
+    pos = j.value("pos", 0.0f);
+    spacing = j.value("spacing", 0.0f);
+    begin = j.value("begin", 0.0f);
+    end = j.value("end", 15.0f);
+    button_dims.load(j, "button_dims", 1.0f);
     return *this;
 }
 Menu& Menu::load(const JsonRef jf) {

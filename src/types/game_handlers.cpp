@@ -12,27 +12,31 @@ const static auto src = "GameHandlers";
 
 void Game::handle_entitysim() {
 
-    {   // Update Bird
-        Chararacter& p = *_scene._world.player;
-        p.vel.y += _scene._world.biomes[0].gravity;
-        p.pos.x += std::min(p.vel.x, 1_b);
-        p.pos.y += std::min(p.vel.y, 1_b);
-        // p.pos.x += p.vel.x;
-        // p.pos.y += p.vel.y;
+    Chararacter& player = *_scene._world.player;
+
+    // Update Player
+    {
+        player.vel.y = (player.vel.y + _scene._world.biomes[0].gravity);
+        player.pos += player.vel * _per_block;
     }
 
-    if (_gamestate & GameState::GAMEOVER) return;
+    // Update Enemies
+    for (Chararacter& enemy : _scene._world.enemies)
+        enemy.pos += enemy.vel;
+
+
+    if (check_flag(_gamestate, GameState::GAMEOVER)) return;
 
     
-    {   // Update Camera
-        Chararacter& p = *_scene._world.player;
+    // Update Camera
+    {
         const Vec2& cam_vel = _scene._cam_vel;
         Vec2& cam_pos = _scene._cam_pos;
         if (std::isnan(cam_vel.x))
-            cam_pos.x = p.pos.x - (_res.x / 2);
+            cam_pos.x = player.pos.x - (_res.x / 2);
         else cam_pos.x += cam_vel.x;
         if (std::isnan(cam_vel.y))
-            cam_pos.y = p.pos.y - (_res.y / 2);
+            cam_pos.y = player.pos.y - (_res.y / 2);
         else cam_pos.y += cam_vel.y;
     }
 
@@ -93,21 +97,21 @@ void Game::handle_input() {
         _gamestate = GameState::INIT;
     }
     if (IsKeyPressed(_controls.pause)) {
-        if (_gamestate & GameState::PAUSED && _menus.size() > 1U) _menus.pop();
-        else _gamestate ^= GameState::PAUSED;
+        if (check_flag(_gamestate, GameState::PAUSED) && _menus.size() > 1U) _menus.pop();
+        else flip_flag(_gamestate, GameState::PAUSED);
     }
 
     // Mouse & Buttons
-    if (_gamestate & GameState::PAUSED ?
+    if (check_flag(_gamestate, GameState::PAUSED) ?
         bool(!_menus.empty() && !_menus.top().buttons.empty()) :
         bool(_scene._world.menu && !_scene._world.menu->buttons.empty())) {
 
-        // LOG_DEBUG(src,
-        //     "\n\n\n  Game paused: " + std::to_string(_gamestate & GameState::PAUSED) + 
+        // LOG_DEBUG(
+        //     "\n\n\n  Game paused: " + std::to_string(check_flag(_gamestate, GameState::PAUSED) + 
         //     ", Pause menus exist: " + std::to_string(!_menus.empty()) + 
         //     ", World menus exist: " + std::to_string(_scene._world.menu == std::nullopt));
 
-        Menu& smenu = (_gamestate & GameState::PAUSED) ? _menus.top() : *_scene._world.menu;
+        Menu& smenu = check_flag(_gamestate, GameState::PAUSED) ? _menus.top() : *_scene._world.menu;
 
 
         // Navigation keys
@@ -140,7 +144,7 @@ void Game::handle_input() {
         }
 
         // Mouse hover
-        Vector2 mouse_pos = GetMousePosition();
+        Vector2 mouse_pos = GetMousePosition() * _per_block;
         uint8_t i, j;
         bool hit = false;
         for (i=0; !hit && i < smenu.buttons.size(); ++i) {
@@ -162,22 +166,23 @@ void Game::handle_input() {
 
         // Select key
         if (IsKeyPressed(_controls.select)) {            
-            LOG_DEBUG(src, "smenu.index: " + std::to_string(smenu.index));
+            LOG_DEBUG("smenu.index: " + std::to_string(smenu.index));
             const ButtonList& sblist = smenu.buttons[smenu.index];
-            LOG_DEBUG(src, "sblist.index: " + std::to_string(sblist.index));
+            LOG_DEBUG("sblist.index: " + std::to_string(sblist.index));
             handle_action(sblist.buttons[sblist.index].action);
         }
     }
 
-    if (_gamestate & GameState::PAUSED) return;
+    if (check_flag(_gamestate, GameState(PAUSED | GAMEOVER))) return;
 
     // Move player
     Chararacter& p1 = *_scene._world.player;
     Biome& b = _scene._world.biomes[0];
     if (IsKeyPressed(_controls.jump)) p1.vel.y = b.jump_strength;
+    const float move_speed = b.move_speed * _per_block;
     const Vec2 vel = {
-        (IsKeyDown(_controls.move[RIGHT]) - IsKeyDown(_controls.move[LEFT])) * b.move_speed,
-        (IsKeyDown(_controls.move[DOWN]) - IsKeyDown(_controls.move[UP])) * b.move_speed
+        (IsKeyDown(_controls.move[RIGHT]) - IsKeyDown(_controls.move[LEFT])) * move_speed,
+        (IsKeyDown(_controls.move[DOWN]) - IsKeyDown(_controls.move[UP])) * move_speed
     };
     if (vel.x && vel.y) {
         p1.pos.x += vel.x * 0.75;
@@ -191,13 +196,13 @@ void Game::handle_input() {
 void Game::handle_collision() {
     Chararacter& p1 = *_scene._world.player;
     Biome& b = _scene._world.biomes[0];
-    const Rectangle p1_rect = p1.rect(1_b, 2_b);
+    const Rectangle p1_rect = p1.rect(1, 2);
 
     // Check player-border collisions
     if (!CheckCollisionRecs(
         p1_rect, {_scene._cam_pos.x, _scene._cam_pos.y, _res.x, _res.y}
     )) {
-        _gamestate |= GameState::GAMEOVER;
+        set_flag(_gamestate, GameState::GAMEOVER);
     }
 
     // Check player-platforms collisions
@@ -240,9 +245,8 @@ void Game::handle_collision() {
         // Check player-pipe collisions
         auto hboxes = pipe.rect(b.pipe_width, b.gap_height);
         if (CheckCollisionRecs(p1_rect, hboxes[0]) ||
-            CheckCollisionRecs(p1_rect, hboxes[1])) {
-            _gamestate |= GameState::GAMEOVER;
-        }
+            CheckCollisionRecs(p1_rect, hboxes[1]))
+            set_flag(_gamestate, GameState::GAMEOVER);
 
         // Scoring
         if (!pipe.passed &&
@@ -260,15 +264,15 @@ void Game::handle_action(const Action& action) {
     // Other Actions
     switch (action.type) {
     case ActionType::LOAD_WORLD:
-        LOG_INFO(src, "Loaded World");
+        LOG_INFO("Loaded World");
         break;
     case ActionType::EXIT_GAME:
-        LOG_INFO(src, "Exiting Game");
+        LOG_INFO("Exiting Game");
         _gamestate = GameState::QUIT;
         break;
 
     case ActionType::SHOW_PROFILES: {
-        LOG_INFO(src, "Fetching Profiles");
+        LOG_INFO("Fetching Profiles");
         const auto profile_names = _serializer.get_files(_serializer.profiles_path, ".profile");
         if (_scene._world.menu)
             for (auto& blist : _scene._world.menu->buttons)
@@ -281,13 +285,13 @@ void Game::handle_action(const Action& action) {
         } break;
 
     case ActionType::LOAD_PROFILE:
-        LOG_INFO(src, "Loading Profile");
+        LOG_INFO("Loading Profile");
         _serializer.loadProfile(
             _serializer.get_files(_serializer.profiles_path, ".profile")[action.index],
             &_profile);
         break;
     default:
-        LOG_WARN(src, "Unknown ActionType: " + std::to_string(uint8_t(action.type)));
+        LOG_WARN("Unknown ActionType: " + std::to_string(uint8_t(action.type)));
         break;
     }
 

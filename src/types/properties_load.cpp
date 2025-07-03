@@ -8,8 +8,8 @@ Vec2& Vec2::load(const JsonRef jf, const std::string field, float def) {
     const nlohmann::json& j = jf;
     if (!j.count(field)) { x = def; y = def; return *this; }
     const auto& arr = j[field];
-    x = arr[0].is_null() ? def : arr[0].get<float>() * BLOCK;
-    y = arr[1].is_null() ? def : arr[1].get<float>() * BLOCK;
+    x = arr[0].is_null() ? def : arr[0].get<float>();
+    y = arr[1].is_null() ? def : arr[1].get<float>();
     return *this;
 }
 Loadout& Loadout::load(const JsonRef jf) {

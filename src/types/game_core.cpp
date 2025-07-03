@@ -7,12 +7,15 @@
 
 #include "raylib.h"
 
+
+#define R(rectangle) ((rectangle - _scene._cam_pos) * _block)
+
 const static auto src = "GameCore";
 
 
 Game::Game() {
-    // SetConfigFlags(FLAG_WINDOW_RESIZABLE); // FLAG_FULLSCREEN_MODE
-    InitWindow(_res.x, _res.y, "Super Flappy Kendoka Person!");
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE); // FLAG_FULLSCREEN_MODE
+    InitWindow(_res.x * _block, _res.y * _block, "Super Flappy Kendoka Person!");
     // InitAudioDevice();
     SetTargetFPS(60);
     SetExitKey(KEY_NULL);
@@ -22,7 +25,7 @@ Game::Game() {
     update_resolution(true);
     set_background({{0.4f, 0.4f, 0.8f}}, {{0.2f, 0.2f, 0.4f}});
 
-    LOG_INFO(src, "Initialized Raylib Components");
+    LOG_INFO("Initialized Raylib Components");
 
     _serializer.loadScene("profile_select.scene");
     {
@@ -32,21 +35,21 @@ Game::Game() {
     }
     reset_scene();
 
-    LOG_INFO(src, "Loaded Resources");
+    LOG_INFO("Loaded Resources");
 };
 
 Game::~Game() {
     // CloseAudioDevice();
     CloseWindow();
-    LOG_INFO(src, "Closed Raylib Components");
+    LOG_INFO("Closed Raylib Components");
 };
 
 
 void Game::simulate() {
     handle_input();
-    if (_gamestate & GameState::PAUSED) return;
+    if (check_flag(_gamestate, GameState::PAUSED)) return;
     handle_entitysim();
-    if (_gamestate & GameState::GAMEOVER) return;
+    if (check_flag(_gamestate, GameState::GAMEOVER)) return;
     handle_spawning();
     handle_collision();
     _scene._actions.clear();
@@ -58,22 +61,22 @@ void Game::render() {
 
     // Background
     BeginShaderMode(_gradient_shader);
-    DrawRectangle(0, 0, _res.x, _res.y, WHITE);
+    DrawRectangle(0, 0, _res.x * _block, _res.y * _block, WHITE);
     EndShaderMode();
 
-    const bool paused = _gamestate & GameState::PAUSED;
+    const bool paused = check_flag(_gamestate, GameState::PAUSED);
     Biome& b = _scene._world.biomes[0];
 
     // Pipes
     for (const auto& pipe : _scene._world.pipes) {
         auto hitboxes = pipe.rect(b.pipe_width, b.gap_height);
-        DrawRectangleRec(std::move(hitboxes[0]) - _scene._cam_pos, GREEN);
-        DrawRectangleRec(std::move(hitboxes[1]) - _scene._cam_pos, GREEN);
+        DrawRectangleRec(R(std::move(hitboxes[0])), GREEN);
+        DrawRectangleRec(R(std::move(hitboxes[1])), GREEN);
     }
 
     // Platforms
     for (const auto& platform : _scene._world.platforms) {
-        DrawRectangleRec(platform.rect() - _scene._cam_pos, BROWN);
+        DrawRectangleRec(R(platform.rect()), BROWN);
     }
 
     // Scene Buttons
@@ -83,9 +86,10 @@ void Game::render() {
         for (i=0 ; i < menu.buttons.size() ; ++i) {
             const ButtonList& button_list = menu.buttons[i];
             if (button_list.buttons.empty()) continue;
-            const auto hitboxes = button_list.rects(_res);
+            auto hitboxes = button_list.rects(_res);
             for (j=0 ; j < hitboxes.size() ; ++j) {
-                const Rectangle hitbox = hitboxes[j];
+                Rectangle& hitbox = hitboxes[j];
+                hitbox = hitbox * _block;
                 DrawRectangleRec(hitbox, (paused ? GRAY : WHITE));
                 DrawText(button_list.buttons[j].text.c_str(), hitbox.x + 5, hitbox.y + 5, 20, DARKGRAY);
             }
@@ -102,9 +106,10 @@ void Game::render() {
         for (i=0 ; i < menu.buttons.size() ; ++i) {
             const ButtonList& button_list = menu.buttons[i];
             if (button_list.buttons.empty()) continue; 
-            const auto hitboxes = button_list.rects(_res);
+            auto hitboxes = button_list.rects(_res);
             for (j=0 ; j < hitboxes.size() ; ++j) {
-                const Rectangle hitbox = hitboxes[j];
+                Rectangle& hitbox = hitboxes[j];
+                hitbox = hitbox * _block;
                 DrawRectangleRec(hitbox, WHITE);
                 DrawText(button_list.buttons[j].text.c_str(), hitbox.x + 5, hitbox.y + 5, 20, DARKGRAY);
             }
@@ -114,13 +119,23 @@ void Game::render() {
     }
 
     // Player
-    DrawRectangleRec(_scene._world.player->rect(1_b, 2_b) - _scene._cam_pos, WHITE);
+    DrawRectangleRec(R(_scene._world.player->rect(1, 2)), WHITE);
 
     // Text
-    DrawText(TextFormat("Score: %d", _scene._score), _res.x - 150, 10, 20, BLUE);
+    DrawText(TextFormat("Score: %d", _scene._score), _res.x * _block - 150, 10, 20, BLUE);
     DrawText("Slappy Bird (Raylib)", 10, 10, 20, DARKGRAY);
-    if (_gamestate & GameState::GAMEOVER) {
-        DrawText("Game Over! Press R to Restart", _res.x /2 - 160, _res.y /2 - 10, 20, MAROON);
+    if (check_flag(_gamestate, GameState::GAMEOVER)) {
+        DrawText(
+            "Game Over! Press Backspace to Restart",
+            _res.x * _block /2 - 160,
+            _res.y * _block /2 - 10,
+            20, MAROON);
+    } else {
+        DrawText(
+            "Game NOT Over! You can do it!!",
+            _res.x * _block /2 - 160,
+            _res.y * _block /2 - 10,
+            20, MAROON);
     }
 
     EndDrawing();
@@ -129,8 +144,10 @@ void Game::render() {
 
 void Game::update_resolution(const bool override) {
     Vector2 res = {(float)GetScreenWidth(), (float)GetScreenHeight()};
-    if (override || !(res == _res)) {
-        _res = {res.x, res.y};
+    if (override || !(res == (_res * _block))) {
+        _block = res.x / 25;
+        _per_block = 1 / _block;
+        _res.y = res.x * _per_block;
         SetShaderValue(
             _gradient_shader,
             GetShaderLocation(_gradient_shader, "resolution"),
@@ -138,7 +155,6 @@ void Game::update_resolution(const bool override) {
             SHADER_UNIFORM_VEC2
         );
     }
-    // BLOCK = _res.x / 25;
 }
 
 void Game::set_background(OptColor color1, OptColor color2) {
@@ -165,7 +181,7 @@ void Game::reset_scene(const Scene* scene) {
 }
 
 bool Game::is_quit() const {
-    return _gamestate & GameState::QUIT;
+    return check_flag(_gamestate, GameState::QUIT);
 }
 
 

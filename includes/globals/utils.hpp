@@ -17,13 +17,25 @@
 constexpr float operator"" _b(unsigned long long value) {
     return static_cast<float>(value) * BLOCK;
 }
-bool operator==(const Vec2& a, const Vec2& b);
-bool operator==(const Vector2& a, const Vector2& b);
-Vec2 operator-(const Vec2& minuend, const Vec2& subraend);
-Rectangle operator-(const Rectangle& minuend, const Vec2& subraend);
 
-GameState& operator^=(GameState& lhs, const GameState& rhs);
-bool operator&(const GameState& lhs, const GameState& rhs);
-GameState operator|=(GameState& lhs, const GameState& rhs);
+// Comparison Operators
+bool operator==(const Vec2& lhs, const Vec2& rhs);
+bool operator==(const Vector2& lhs, const Vector2& rhs);
+
+// Aritmetic Operators
+Vec2 operator-(const Vec2& lhs, const Vec2& rhs);
+Vec2 operator*(const Vec2& lhs, const float rhs);
+Vector2 operator*(const Vector2& lhs, const float rhs);
+Rectangle operator-(const Rectangle& lhs, const Vec2& rhs);
+Rectangle operator*(const Rectangle& lhs, const float rhs);
+
+// Assignment Operators
+Vec2& operator+=(Vec2& lhs, const Vec2& rhs);
+Rectangle& operator*=(Rectangle& lhs, const float rhs);
+
+// Enum Operators
+bool check_flag(const GameState& lhs, const GameState& rhs);
+GameState& flip_flag(GameState& lhs, const GameState& rhs);
+GameState& set_flag(GameState& lhs, const GameState& rhs);
 
 

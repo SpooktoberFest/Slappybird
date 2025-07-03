@@ -8,7 +8,6 @@
 
 Vec2::operator Vector2() const { return {x, y}; };
 
-
 Vec2& Vec2::emplace(const Vec2& other) {
     if (x == QNAN) x = other.x;
     if (y == QNAN) y = other.y;

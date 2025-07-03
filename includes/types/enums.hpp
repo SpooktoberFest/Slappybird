@@ -7,15 +7,15 @@
 
 enum Diretion : int8_t { UP, DOWN, LEFT, RIGHT };
 
-
-// Scoped enums
-
-enum class GameState : uint8_t {
+enum GameState : uint8_t {
     INIT        = 0,
     GAMEOVER    = 1,
     PAUSED      = 2,
     QUIT        = 4
 };
+
+
+// Scoped enums
 
 
 enum class ActionType : uint8_t {

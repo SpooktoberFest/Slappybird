@@ -4,7 +4,6 @@
 #include <array>
 #include <stack>
 
-#include "utils.hpp"
 #include "enums.hpp"
 #include "forward_decl.hpp"
 #include "properties.hpp"
@@ -53,7 +52,9 @@ private:
     GameState _gamestate = GameState::INIT;
 
     // Misc
-    Vec2 _res = {25_b, 15_b}; // Window resolution
+    Vec2 _res = {25, 15};           // Window resolution in blocks
+    float _block = 32.0f;           // Block length (fixed to 25th of window width)
+    float _per_block = 1/_block;    // Reciprocal of _block
     Serializer _serializer;
     Shader_ _gradient_shader;
     ControlScheme _controls;

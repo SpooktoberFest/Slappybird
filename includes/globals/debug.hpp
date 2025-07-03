@@ -12,37 +12,37 @@
 */
 
 #if LOG_LEVEL >= 5
-#define LOG_DEBUG(source, output) \
-    std::cout << "DEBUG: [" << source << "] " << output << '\n';
+#define LOG_DEBUG(output) \
+    std::cout << "DEBUG: [" << src << "] " << output << std::endl;
 #else
-#define LOG_DEBUG(source, output)
+#define LOG_DEBUG(output)
 #endif
 
 #if LOG_LEVEL >= 4
-#define LOG_INFO(source, output) \
-    std::cout << "INFO: [" << source << "] " << output << '\n';
+#define LOG_INFO(output) \
+    std::cout << "INFO: [" << src << "] " << output << std::endl;
 #else
-#define LOG_INFO(source, output)
+#define LOG_INFO(output)
 #endif
 
 #if LOG_LEVEL >= 3
-#define LOG_WARN(source, output) \
-    std::cerr << "WARN: [" << source << "] " << output << '\n';
+#define LOG_WARN(output) \
+    std::cerr << "WARN: [" << src << "] " << output << std::endl;
 #else
-#define LOG_WARN(source, output)
+#define LOG_WARN(output)
 #endif
 
 #if LOG_LEVEL >= 2
-#define LOG_ERROR(source, output) \
-    std::cerr << "ERROR: [" << source << "] " << output << '\n';
+#define LOG_ERROR(output) \
+    std::cerr << "ERROR: [" << src << "] " << output << std::endl;
 #else
-#define LOG_ERROR(source, output)
+#define LOG_ERROR(output)
 #endif
 
 #if LOG_LEVEL >= 1
-#define LOG_FATAL(source, output) \
-    std::cerr << "FATAL: [" << source << "] " << output << '\n';
+#define LOG_FATAL(output) \
+    std::cerr << "FATAL: [" << src << "] " << output << std::endl;
 #else
-#define LOG_FATAL(source, output)
+#define LOG_FATAL(output)
 #endif
 
