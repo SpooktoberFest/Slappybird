@@ -66,6 +66,7 @@ ButtonList& ButtonList::load(const JsonRef jf) {
 }
 Menu& Menu::load(const JsonRef jf) {
     const nlohmann::json& j = jf;
+    fixed = j.value("fixed", true);
     foreach_if_exists("buttons")       buttons.push_back(ButtonList().load(elem));
     return *this;
 }
@@ -85,6 +86,7 @@ Spawner& Spawner::load(const JsonRef jf) {
     const nlohmann::json& j = jf;
     pos.load(j, "pos");
     vel.load(j, "vel");
+    fixed = j.value("fixed", true);
     predicate.type = j.value("action_type", ActionType::NOP);
     predicate.index = j.value("action_index", 0);
     use_index = j.value("use_index", false);

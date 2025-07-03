@@ -1,5 +1,4 @@
-#ifndef SUPERFLAPPY_DEBUG_HPP
-#define SUPERFLAPPY_DEBUG_HPP
+#pragma once
 
 #include <iostream>
 
@@ -47,4 +46,3 @@
 #define LOG_FATAL(source, output)
 #endif
 
-#endif // SUPERFLAPPY_DEBUG_HPP

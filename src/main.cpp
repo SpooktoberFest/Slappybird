@@ -1,9 +1,12 @@
 
 #include <ctime>
+#include "utils.hpp"
 #include "game.hpp"
 #include "debug.hpp"
 
 const static auto src = "Main";
+
+
 
 int main(int argc, char** argv) {
     {

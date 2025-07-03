@@ -1,5 +1,4 @@
-#ifndef SUPERFLAPPY_OPERATORS_HPP
-#define SUPERFLAPPY_OPERATORS_HPP
+#pragma once
 
 #include <limits>
 
@@ -10,8 +9,9 @@
 #define branchless_ternary(pred, a, b) (a & -pred) | (b & ~-pred)
 
 #define QNAN std::numeric_limits<float>::quiet_NaN()
-#define BLOCK 32.0f
 
+#define BLOCK 32.0f
+// extern float BLOCK;
 
 // Literal for block unit
 constexpr float operator"" _b(unsigned long long value) {
@@ -27,6 +27,3 @@ bool operator&(const GameState& lhs, const GameState& rhs);
 GameState operator|=(GameState& lhs, const GameState& rhs);
 
 
-
-
-#endif // SUPERFLAPPY_OPERATORS_HPP

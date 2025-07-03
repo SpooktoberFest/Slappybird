@@ -1,5 +1,4 @@
-#ifndef SUPERFLAPPY_PROPERTIES_HPP
-#define SUPERFLAPPY_PROPERTIES_HPP
+#pragma once
 
 #include <array>
 #include <cereal/types/array.hpp>
@@ -72,4 +71,5 @@ struct Action {
 };
 
 
-#endif // SUPERFLAPPY_PROPERTIES_HPP
+
+

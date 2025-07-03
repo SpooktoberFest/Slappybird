@@ -1,5 +1,4 @@
-#ifndef SUPERFLAPPY_ENTITIES_HPP
-#define SUPERFLAPPY_ENTITIES_HPP
+#pragma once
 
 #include <string>
 #include <vector>
@@ -106,6 +105,7 @@ struct ButtonList {
 struct Menu {
     std::vector<ButtonList> buttons;
     uint8_t index;
+    bool fixed = true;
 
     void clamp();
 
@@ -113,7 +113,7 @@ struct Menu {
     Menu& load(const JsonRef jf);
     template <class Archive>
     void serialize(Archive& ar) {
-        ar(buttons);
+        ar(buttons, fixed);
     }
 };
 
@@ -138,6 +138,7 @@ struct World {
 struct Spawner {
     Vec2 pos;
     Vec2 vel;
+    bool fixed = true;
 
     Action predicate;
     bool use_index;
@@ -148,7 +149,7 @@ struct Spawner {
     // (De)Serialization
     Spawner& load(const JsonRef jf);
     template <class Archive>
-    void serialize(Archive& ar) { ar(pos, vel, predicate, use_index, spawn_in); }
+    void serialize(Archive& ar) { ar(fixed, pos, vel, predicate, use_index, spawn_in); }
 };
 
 class Scene {
@@ -173,5 +174,3 @@ public:
 
 
 
-
-#endif // SUPERFLAPPY_ENTITIES_HPP

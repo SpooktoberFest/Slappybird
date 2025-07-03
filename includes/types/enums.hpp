@@ -1,9 +1,14 @@
-#ifndef SUPERFLAPPY_ENUMS_HPP
-#define SUPERFLAPPY_ENUMS_HPP
+#pragma once
 
 #include <limits.h>
 #include <cstdint>
 
+// Unscoped enums
+
+enum Diretion : int8_t { UP, DOWN, LEFT, RIGHT };
+
+
+// Scoped enums
 
 enum class GameState : uint8_t {
     INIT        = 0,
@@ -31,8 +36,6 @@ enum class ActionType : uint8_t {
     NEW_PROFILE,
     DELETE_PROFILE,
 };
-
-enum Diretion : int8_t { UP, DOWN, LEFT, RIGHT };
 
 enum class Equipment : uint8_t {
     DEFAULT_M, DEFAULT_F,
@@ -80,4 +83,5 @@ enum class Type : uint8_t {
 };
 
 
-#endif // SUPERFLAPPY_ENUMS_HPP
+
+

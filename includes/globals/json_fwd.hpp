@@ -1,5 +1,4 @@
-#ifndef SUPERFLAPPY_JSONFWD_HPP
-#define SUPERFLAPPY_JSONFWD_HPP
+#pragma once
 
 #include "nlohmann/json.hpp"
 
@@ -9,5 +8,3 @@ struct JsonRef {
 private:
     const nlohmann::json& j;
 };
-
-#endif // SUPERFLAPPY_JSONFWD_HPP

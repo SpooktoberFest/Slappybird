@@ -138,6 +138,7 @@ void Game::update_resolution(const bool override) {
             SHADER_UNIFORM_VEC2
         );
     }
+    // BLOCK = _res.x / 25;
 }
 
 void Game::set_background(OptColor color1, OptColor color2) {

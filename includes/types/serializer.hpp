@@ -1,5 +1,4 @@
-#ifndef SUPERFLAPPY_SERIALIZER_HPP
-#define SUPERFLAPPY_SERIALIZER_HPP
+#pragma once
 
 #include "entities.hpp"
 #include "properties.hpp"
@@ -45,4 +44,3 @@ private:
 };
 
 
-#endif // SUPERFLAPPY_SERIALIZER_HPP

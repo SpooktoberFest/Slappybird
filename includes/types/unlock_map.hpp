@@ -1,5 +1,4 @@
-#ifndef SUPERFLAPPY_UNLOCK_MAP_HPP
-#define SUPERFLAPPY_UNLOCK_MAP_HPP
+#pragma once
 
 #include <vector>
 #include <type_traits>
@@ -64,4 +63,4 @@ public:
 	}
 };
 
-#endif // SUPERFLAPPY_UNLOCK_MAP_HPP
+

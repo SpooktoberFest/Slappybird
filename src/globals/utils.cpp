@@ -3,6 +3,7 @@
 
 #include "raylib.h"
 
+// float BLOCK = 32.0f;
 
 bool operator==(const Vec2& a, const Vec2& b) {
     return a.x == b.x && a.y == b.y;

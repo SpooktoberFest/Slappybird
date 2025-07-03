@@ -1,6 +1,4 @@
-
-#ifndef SUPERFLAPPY_FWD_DECL_HPP
-#define SUPERFLAPPY_FWD_DECL_HPP
+#pragma once
 
 #include <cstring>
 
@@ -34,4 +32,3 @@ private:
 enum KeyboardKey_ {};
 
 
-#endif // SUPERFLAPPY_FWD_DECL_HPP

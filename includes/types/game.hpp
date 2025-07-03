@@ -1,5 +1,4 @@
-#ifndef SUPERFLAPPY_GAME_HPP
-#define SUPERFLAPPY_GAME_HPP
+#pragma once
 
 #include <optional>
 #include <array>
@@ -62,5 +61,3 @@ private:
 
 
 
-
-#endif // SUPERFLAPPY_GAME_HPP

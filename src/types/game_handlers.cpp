@@ -169,7 +169,6 @@ void Game::handle_input() {
         }
     }
 
-
     if (_gamestate & GameState::PAUSED) return;
 
     // Move player
