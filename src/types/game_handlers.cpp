@@ -21,7 +21,7 @@ void Game::handle_entitysim() {
         // p.pos.y += p.vel.y;
     }
 
-    if (_gamestate >= GameState::GAMEOVER) return;
+    if (_gamestate & GameState::GAMEOVER) return;
 
     
     {   // Update Camera
@@ -90,44 +90,32 @@ void Game::handle_input() {
 
     if (IsKeyPressed(_controls.reset)) {
         reset_scene();
-        _gamestate = GameState::RUNNING;
+        _gamestate = GameState::INIT;
     }
     if (IsKeyPressed(_controls.pause)) {
-        switch (_gamestate) {
-        case GameState::PAUSED:
-            _gamestate = GameState::RUNNING; break;
-        case GameState::RUNNING:
-            _gamestate = GameState::PAUSED; break;
-        case GameState::GAMEOVER:
-            if (_menus.size() > 1U) _menus.pop();
-            else _gamestate = GameState::PAUSED_GAMEOVER; break;
-        case GameState::PAUSED_GAMEOVER:
-            if (_menus.size() > 1U) _menus.pop();
-            else _gamestate = GameState::GAMEOVER; break;
-        default: break;
-        }
+        if (_gamestate & GameState::PAUSED && _menus.size() > 1U) _menus.pop();
+        else _gamestate ^= GameState::PAUSED;
     }
 
     // Mouse & Buttons
-    if (_gamestate == GameState::PAUSED ?
+    if (_gamestate & GameState::PAUSED ?
         bool(!_menus.empty() && !_menus.top().buttons.empty()) :
         bool(_scene._world.menu && !_scene._world.menu->buttons.empty())) {
 
         // LOG_DEBUG(src,
-        //     "\n\n\n  Game paused: " + std::to_string(_gamestate == GameState::PAUSED) + 
+        //     "\n\n\n  Game paused: " + std::to_string(_gamestate & GameState::PAUSED) + 
         //     ", Pause menus exist: " + std::to_string(!_menus.empty()) + 
         //     ", World menus exist: " + std::to_string(_scene._world.menu == std::nullopt));
 
-        const bool paused = bool(_gamestate == GameState::PAUSED);
-        Menu& smenu = paused ? _menus.top() : *_scene._world.menu;
+        Menu& smenu = (_gamestate & GameState::PAUSED) ? _menus.top() : *_scene._world.menu;
 
 
         // Navigation keys
         {
             smenu.clamp();
             ButtonList* sblist = &smenu.buttons[smenu.index];
-            u_int8_t nav_x = IsKeyPressed(_controls.nav[RIGHT]) - IsKeyPressed(_controls.nav[LEFT]);
-            u_int8_t nav_y = IsKeyPressed(_controls.nav[DOWN]) - IsKeyPressed(_controls.nav[UP]);
+            uint8_t nav_x = IsKeyPressed(_controls.nav[RIGHT]) - IsKeyPressed(_controls.nav[LEFT]);
+            uint8_t nav_y = IsKeyPressed(_controls.nav[DOWN]) - IsKeyPressed(_controls.nav[UP]);
             if (sblist->horizontal) std::swap(nav_x, nav_y);
 
             sblist->index += nav_y;
@@ -153,7 +141,7 @@ void Game::handle_input() {
 
         // Mouse hover
         Vector2 mouse_pos = GetMousePosition();
-        u_int8_t i, j;
+        uint8_t i, j;
         bool hit = false;
         for (i=0; !hit && i < smenu.buttons.size(); ++i) {
             const auto hitboxes = smenu.buttons[i].rects(_res);
@@ -182,7 +170,7 @@ void Game::handle_input() {
     }
 
 
-    if (_gamestate > GameState::RUNNING) return;
+    if (_gamestate & GameState::PAUSED) return;
 
     // Move player
     Chararacter& p1 = *_scene._world.player;
@@ -210,7 +198,7 @@ void Game::handle_collision() {
     if (!CheckCollisionRecs(
         p1_rect, {_scene._cam_pos.x, _scene._cam_pos.y, _res.x, _res.y}
     )) {
-        _gamestate = GameState::GAMEOVER;
+        _gamestate |= GameState::GAMEOVER;
     }
 
     // Check player-platforms collisions
@@ -254,7 +242,7 @@ void Game::handle_collision() {
         auto hboxes = pipe.rect(b.pipe_width, b.gap_height);
         if (CheckCollisionRecs(p1_rect, hboxes[0]) ||
             CheckCollisionRecs(p1_rect, hboxes[1])) {
-            _gamestate = GameState::GAMEOVER;
+            _gamestate |= GameState::GAMEOVER;
         }
 
         // Scoring
@@ -277,7 +265,8 @@ void Game::handle_action(const Action& action) {
         break;
     case ActionType::EXIT_GAME:
         LOG_INFO(src, "Exiting Game");
-        _gamestate = QUIT; break;
+        _gamestate = GameState::QUIT;
+        break;
 
     case ActionType::SHOW_PROFILES: {
         LOG_INFO(src, "Fetching Profiles");
@@ -299,7 +288,7 @@ void Game::handle_action(const Action& action) {
             &_profile);
         break;
     default:
-        LOG_WARN(src, "Unknown ActionType: " + std::to_string(action.type));
+        LOG_WARN(src, "Unknown ActionType: " + std::to_string(uint8_t(action.type)));
         break;
     }
 

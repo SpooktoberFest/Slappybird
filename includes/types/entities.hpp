@@ -85,7 +85,7 @@ struct Button {
 
 struct ButtonList {
     std::vector<Button> buttons;
-    u_int8_t index = 0;
+    uint8_t index = 0;
     bool horizontal = false;
     float pos, spacing, begin, end;
     Vec2 button_dims = {1_b, 1_b};
@@ -105,7 +105,7 @@ struct ButtonList {
 
 struct Menu {
     std::vector<ButtonList> buttons;
-    u_int8_t index;
+    uint8_t index;
 
     void clamp();
 
@@ -159,7 +159,7 @@ public:
     World _world;
     Vec2 _cam_vel; // Where QNAN means follow player
     Vec2 _cam_pos;
-    u_int16_t _score = 0;
+    uint8_t _score = 0;
     std::vector<Action> _actions = {{ActionType::LOAD_WORLD}};
 
     // (De)Serialization

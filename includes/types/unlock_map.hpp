@@ -26,7 +26,7 @@ public:
 			if (_data[i] > entry) break;
 		}
 
-		if (i % 2 == 1) return; // already in an interval
+		if (i & 1) return; // already in an interval
 
 		if (i == _data.size()) {
 			_data.push_back(entry);

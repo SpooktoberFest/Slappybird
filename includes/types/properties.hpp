@@ -4,9 +4,9 @@
 #include <array>
 #include <cereal/types/array.hpp>
 
+#include "enums.hpp"
 #include "forward_decl.hpp"
 #include "unlock_map.hpp"
-#include "enums.hpp"
 
 
 struct Vec2 {
@@ -63,7 +63,7 @@ struct Profile {
 
 struct Action {
     ActionType type;
-    u_int8_t index;
+    uint8_t index;
 
     // (De)Serialization
     Action& load(const JsonRef jf);

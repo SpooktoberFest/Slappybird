@@ -3,11 +3,6 @@
 # To do:
 
 Now:
-- Bugs:
-    - Vertical menu navigation doesn't work
-    - Bug where move-up key causes nav-left
-    - Bug where nav-left is unclamped
-- Gamestate use flags
 - Spawners
 
 

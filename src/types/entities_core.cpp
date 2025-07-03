@@ -45,17 +45,17 @@ Scene::Scene() {
 void Menu::clamp() {
     if (buttons.empty()) return;
     index = branchless_ternary(
-        u_int8_t(index < 200),
-        u_int8_t(index % buttons.size()),
-        u_int8_t(buttons.size() + index)
+        uint8_t(index < 200),
+        uint8_t(index % buttons.size()),
+        uint8_t(buttons.size() + index)
     );
 }
 void ButtonList::clamp() {
     if (buttons.empty()) return;
     index = branchless_ternary(
-        u_int8_t(index < 200),
-        u_int8_t(index % buttons.size()),
-        u_int8_t(buttons.size() + index)
+        uint8_t(index < 200),
+        uint8_t(index % buttons.size()),
+        uint8_t(buttons.size() + index)
     );
 }
 
@@ -77,7 +77,7 @@ bool Spawner::check_predicate(const Game& context) const {
 void ButtonList::load_buttons(const std::vector<std::string>& str_vec, ActionType type) {
     buttons.clear();
     for (std::size_t i=0 ; i < str_vec.size() ; ++i)
-        buttons.push_back(Button{str_vec[i], Action{type, u_int8_t(i)}});
+        buttons.push_back(Button{str_vec[i], Action{type, uint8_t(i)}});
 }
 
 

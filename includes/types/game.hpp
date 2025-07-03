@@ -6,6 +6,7 @@
 #include <stack>
 
 #include "utils.hpp"
+#include "enums.hpp"
 #include "forward_decl.hpp"
 #include "properties.hpp"
 #include "entities.hpp"
@@ -14,10 +15,6 @@
 
 class Game {
     using OptColor = std::optional<std::array<float, 3>>;
-
-    enum GameState : u_int8_t {
-        RUNNING, GAMEOVER, PAUSED, PAUSED_GAMEOVER, INIT, QUIT
-    };
 
 public:
     Game();

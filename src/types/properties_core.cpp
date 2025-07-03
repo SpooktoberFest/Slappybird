@@ -18,7 +18,7 @@ Vec2& Vec2::emplace(const Vec2& other) {
 
 ControlScheme::ControlScheme() :
     move({K(KEY_UP), K(KEY_DOWN), K(KEY_LEFT), K(KEY_RIGHT)}),
-    nav({K(KEY_W), K(KEY_S), K(KEY_A), K(KEY_UP)}),
+    nav({K(KEY_W), K(KEY_S), K(KEY_A), K(KEY_D)}),
     jump(K(KEY_SPACE)),
     select(K(KEY_ENTER)),
     pause(K(KEY_ESCAPE)),

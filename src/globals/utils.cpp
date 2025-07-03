@@ -28,5 +28,14 @@ Rectangle operator-(const Rectangle& minuend, const Vec2& subraend) {
     };
 }
 
+GameState& operator^=(GameState& lhs, const GameState& rhs) {
+    return (lhs = GameState(uint8_t(lhs) ^ uint8_t(rhs)));
+}
+bool operator&(const GameState& lhs, const GameState& rhs) {
+    return (bool(uint8_t(lhs) & uint8_t(rhs)));
+}
+GameState operator|=(GameState& lhs, const GameState& rhs) {
+    return (lhs = GameState(uint8_t(lhs) | uint8_t(rhs)));
+}
 
 

@@ -33,7 +33,6 @@ Game::Game() {
     reset_scene();
 
     LOG_INFO(src, "Loaded Resources");
-    _gamestate = GameState::RUNNING;
 };
 
 Game::~Game() {
@@ -45,9 +44,9 @@ Game::~Game() {
 
 void Game::simulate() {
     handle_input();
-    if (_gamestate >= GameState::PAUSED) return;
+    if (_gamestate & GameState::PAUSED) return;
     handle_entitysim();
-    if (_gamestate >= GameState::GAMEOVER) return;
+    if (_gamestate & GameState::GAMEOVER) return;
     handle_spawning();
     handle_collision();
     _scene._actions.clear();
@@ -62,7 +61,7 @@ void Game::render() {
     DrawRectangle(0, 0, _res.x, _res.y, WHITE);
     EndShaderMode();
 
-    const bool is_running = _gamestate == GameState::RUNNING;
+    const bool paused = _gamestate & GameState::PAUSED;
     Biome& b = _scene._world.biomes[0];
 
     // Pipes
@@ -87,17 +86,17 @@ void Game::render() {
             const auto hitboxes = button_list.rects(_res);
             for (j=0 ; j < hitboxes.size() ; ++j) {
                 const Rectangle hitbox = hitboxes[j];
-                DrawRectangleRec(hitbox, (is_running ? WHITE : GRAY));
+                DrawRectangleRec(hitbox, (paused ? GRAY : WHITE));
                 DrawText(button_list.buttons[j].text.c_str(), hitbox.x + 5, hitbox.y + 5, 20, DARKGRAY);
             }
 
-            if (menu.index == i && is_running)
+            if (menu.index == i && !paused)
                 DrawRectangleLinesEx(hitboxes[button_list.index], 5.0f, YELLOW);
         }
     }
 
     // Menu Buttons
-    if (!is_running && !_menus.empty() && !_menus.top().buttons.empty()) {
+    if (paused && !_menus.empty() && !_menus.top().buttons.empty()) {
         const Menu& menu = _menus.top();
         std::size_t i, j;
         for (i=0 ; i < menu.buttons.size() ; ++i) {
@@ -120,7 +119,7 @@ void Game::render() {
     // Text
     DrawText(TextFormat("Score: %d", _scene._score), _res.x - 150, 10, 20, BLUE);
     DrawText("Slappy Bird (Raylib)", 10, 10, 20, DARKGRAY);
-    if (_gamestate == GameState::QUIT) {
+    if (_gamestate & GameState::GAMEOVER) {
         DrawText("Game Over! Press R to Restart", _res.x /2 - 160, _res.y /2 - 10, 20, MAROON);
     }
 
@@ -165,7 +164,7 @@ void Game::reset_scene(const Scene* scene) {
 }
 
 bool Game::is_quit() const {
-    return _gamestate == GameState::QUIT;
+    return _gamestate & GameState::QUIT;
 }
 
 

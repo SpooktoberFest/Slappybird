@@ -2,8 +2,18 @@
 #define SUPERFLAPPY_ENUMS_HPP
 
 #include <limits.h>
+#include <cstdint>
 
-enum ActionType : u_int8_t {
+
+enum class GameState : uint8_t {
+    INIT        = 0,
+    GAMEOVER    = 1,
+    PAUSED      = 2,
+    QUIT        = 4
+};
+
+
+enum class ActionType : uint8_t {
     // Actions that can be called from any world
     NOP,
     TOGGLE_GROUP,
@@ -24,7 +34,7 @@ enum ActionType : u_int8_t {
 
 enum Diretion : int8_t { UP, DOWN, LEFT, RIGHT };
 
-enum class Equipment : u_int16_t {
+enum class Equipment : uint8_t {
     DEFAULT_M, DEFAULT_F,
     WHITE_M, WHITE_F,
     BLACK_M, BLACK_F,
@@ -36,12 +46,12 @@ enum class Equipment : u_int16_t {
     RAINBOW_L, RAINBOW_G, RAINBOW_T,
 };
 
-enum class Technique : u_int16_t {
+enum class Technique : uint8_t {
     NONE,
     MEN, DO, KOTE
 };
 
-enum class Type : u_int8_t {
+enum class Type : uint8_t {
     NONE,
 
     PROPERTY,

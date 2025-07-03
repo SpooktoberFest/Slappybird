@@ -36,8 +36,8 @@ ControlScheme& ControlScheme::load(const JsonRef jf) {
 }
 Profile& Profile::load(const JsonRef jf) {
     const nlohmann::json& j = jf;
-    equipment = unlock_map<Equipment>(j.value("equipment", std::vector<u_int16_t>()));
-    moves = unlock_map<Technique>(j.value("moves", std::vector<u_int16_t>()));
+    equipment = unlock_map<Equipment>(j.value("equipment", std::vector<uint8_t>()));
+    moves = unlock_map<Technique>(j.value("moves", std::vector<uint8_t>()));
     return *this;
 }
 Action& Action::load(const JsonRef jf) {
