@@ -69,14 +69,14 @@ void Game::render() {
 
     // Pipes
     for (const auto& pipe : _scene._world.pipes) {
-        auto hitboxes = pipe.rect(b.pipe_width, b.gap_height);
+        auto hitboxes = pipe.get_hitbox(b.pipe_width, b.gap_height);
         DrawRectangleRec(R(std::move(hitboxes[0])), GREEN);
         DrawRectangleRec(R(std::move(hitboxes[1])), GREEN);
     }
 
     // Platforms
     for (const auto& platform : _scene._world.platforms) {
-        DrawRectangleRec(R(platform.rect()), BROWN);
+        DrawRectangleRec(R(platform.get_hitbox()), BROWN);
     }
 
     // Scene Buttons
@@ -86,7 +86,7 @@ void Game::render() {
         for (i=0 ; i < menu.buttons.size() ; ++i) {
             const ButtonList& button_list = menu.buttons[i];
             if (button_list.buttons.empty()) continue;
-            auto hitboxes = button_list.rects(_res);
+            auto hitboxes = button_list.get_hitboxes(_res);
             for (j=0 ; j < hitboxes.size() ; ++j) {
                 Rectangle& hitbox = hitboxes[j];
                 hitbox = hitbox * _block;
@@ -106,7 +106,7 @@ void Game::render() {
         for (i=0 ; i < menu.buttons.size() ; ++i) {
             const ButtonList& button_list = menu.buttons[i];
             if (button_list.buttons.empty()) continue; 
-            auto hitboxes = button_list.rects(_res);
+            auto hitboxes = button_list.get_hitboxes(_res);
             for (j=0 ; j < hitboxes.size() ; ++j) {
                 Rectangle& hitbox = hitboxes[j];
                 hitbox = hitbox * _block;
@@ -119,7 +119,7 @@ void Game::render() {
     }
 
     // Player
-    DrawRectangleRec(R(_scene._world.player->rect(1, 2)), WHITE);
+    DrawRectangleRec(R(_scene._world.player->get_hitbox(1, 2)), WHITE);
 
     // Text
     DrawText(TextFormat("Score: %d", _scene._score), _res.x * _block - 150, 10, 20, BLUE);
@@ -127,12 +127,6 @@ void Game::render() {
     if (check_flag(_gamestate, GameState::GAMEOVER)) {
         DrawText(
             "Game Over! Press Backspace to Restart",
-            _res.x * _block /2 - 160,
-            _res.y * _block /2 - 10,
-            20, MAROON);
-    } else {
-        DrawText(
-            "Game NOT Over! You can do it!!",
             _res.x * _block /2 - 160,
             _res.y * _block /2 - 10,
             20, MAROON);

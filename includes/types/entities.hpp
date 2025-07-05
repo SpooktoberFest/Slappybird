@@ -18,7 +18,7 @@ struct Chararacter {
     Vec2 pos;
     Vec2 vel;
 
-    Rectangle rect(float w=1, float h=1) const;
+    Rectangle get_hitbox(float w=1, float h=1) const;
 
     // (De)Serialization
     Chararacter& load(const JsonRef jf);
@@ -31,7 +31,7 @@ struct Pipe {
     Vec2 pos;
     bool passed;
 
-    std::array<Rectangle, 2> rect(const float w, const float h) const;
+    std::array<Rectangle, 2> get_hitbox(const float w, const float h) const;
 
     // (De)Serialization
     Pipe& load(const JsonRef jf);
@@ -43,7 +43,7 @@ struct Platform {
     Vec2 pos;
     Vec2 size {1, 1};
 
-    Rectangle rect() const;
+    Rectangle get_hitbox() const;
 
     // (De)Serialization
     Platform& load(const JsonRef jf);
@@ -90,9 +90,9 @@ struct ButtonList {
     Vec2 button_dims = {1, 1};
     Type special_content = Type::NONE;
 
-    void clamp();
+    void clamp_index();
     void load_buttons(const std::vector<std::string>& str_vec, const ActionType type);
-    std::vector<Rectangle> rects(const Vector2& res) const;
+    std::vector<Rectangle> get_hitboxes(const Vector2& res) const;
 
     // (De)Serialization
     ButtonList& load(const JsonRef jf);
@@ -107,7 +107,7 @@ struct Menu {
     uint8_t index;
     bool fixed = true;
 
-    void clamp();
+    void clamp_index();
 
     // (De)Serialization
     Menu& load(const JsonRef jf);

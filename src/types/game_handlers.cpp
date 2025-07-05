@@ -116,7 +116,7 @@ void Game::handle_input() {
 
         // Navigation keys
         {
-            smenu.clamp();
+            smenu.clamp_index();
             ButtonList* sblist = &smenu.buttons[smenu.index];
             uint8_t nav_x = IsKeyPressed(_controls.nav[RIGHT]) - IsKeyPressed(_controls.nav[LEFT]);
             uint8_t nav_y = IsKeyPressed(_controls.nav[DOWN]) - IsKeyPressed(_controls.nav[UP]);
@@ -124,8 +124,8 @@ void Game::handle_input() {
 
             sblist->index += nav_y;
             smenu.index += nav_x;
-            sblist->clamp();
-            smenu.clamp();
+            sblist->clamp_index();
+            smenu.clamp_index();
 
             if (nav_y != 0) {
                 // Update selected button list
@@ -138,8 +138,8 @@ void Game::handle_input() {
                     smenu.buttons[smenu.index].index,
                     sblist->index
                 );
-                // Clamp new button list
-                sblist->clamp();
+                // clamp_index new button list
+                sblist->clamp_index();
             }
         }
 
@@ -148,7 +148,7 @@ void Game::handle_input() {
         uint8_t i, j;
         bool hit = false;
         for (i=0; !hit && i < smenu.buttons.size(); ++i) {
-            const auto hitboxes = smenu.buttons[i].rects(_res);
+            const auto hitboxes = smenu.buttons[i].get_hitboxes(_res);
             for (j=0; j < hitboxes.size(); ++j) {
                 const Rectangle& hitbox = hitboxes[j];
                 if (CheckCollisionPointRec(mouse_pos, hitbox)) {
@@ -196,7 +196,7 @@ void Game::handle_input() {
 void Game::handle_collision() {
     Chararacter& p1 = *_scene._world.player;
     Biome& b = _scene._world.biomes[0];
-    const Rectangle p1_rect = p1.rect(1, 2);
+    const Rectangle p1_rect = p1.get_hitbox(1, 2);
 
     // Check player-border collisions
     if (!CheckCollisionRecs(
@@ -207,7 +207,7 @@ void Game::handle_collision() {
 
     // Check player-platforms collisions
     for (const auto& pf : _scene._world.platforms) {
-        if (CheckCollisionRecs(p1_rect, pf.rect())) {
+        if (CheckCollisionRecs(p1_rect, pf.get_hitbox())) {
             float arr[4] = {
                 pf.pos.x + pf.size.x - p1.pos.x,
                 p1.pos.x + p1_rect.width - pf.pos.x,
@@ -243,7 +243,7 @@ void Game::handle_collision() {
         }
 
         // Check player-pipe collisions
-        auto hboxes = pipe.rect(b.pipe_width, b.gap_height);
+        auto hboxes = pipe.get_hitbox(b.pipe_width, b.gap_height);
         if (CheckCollisionRecs(p1_rect, hboxes[0]) ||
             CheckCollisionRecs(p1_rect, hboxes[1]))
             set_flag(_gamestate, GameState::GAMEOVER);

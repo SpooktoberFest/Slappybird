@@ -42,7 +42,7 @@ Scene::Scene() {
 };
 
 
-void Menu::clamp() {
+void Menu::clamp_index() {
     if (buttons.empty()) return;
     index = branchless_ternary(
         uint8_t(index < 200),
@@ -50,7 +50,7 @@ void Menu::clamp() {
         uint8_t(buttons.size() + index)
     );
 }
-void ButtonList::clamp() {
+void ButtonList::clamp_index() {
     if (buttons.empty()) return;
     index = branchless_ternary(
         uint8_t(index < 200),
@@ -82,30 +82,29 @@ void ButtonList::load_buttons(const std::vector<std::string>& str_vec, ActionTyp
 
 
 // Rect functions
-std::vector<Rectangle> ButtonList::rects(const Vector2& res) const {
-    std::vector<Rectangle> rects;
+std::vector<Rectangle> ButtonList::get_hitboxes(const Vector2& res) const {
+    std::vector<Rectangle> get_hitboxes;
     const float offset = pos < 0.0f ? (horizontal ? res.y : res.x) : 0.0f;
-    Rectangle rect = {
+    Rectangle get_hitbox = {
         horizontal ? begin : pos + offset,
         horizontal ? pos + offset : begin,
         button_dims.x,
         button_dims.y
     };
     for (const auto& _ : buttons) {
-        rects.push_back(rect);
+        get_hitboxes.push_back(get_hitbox);
         horizontal ?
-            rect.x += button_dims.x + spacing :
-            rect.y += button_dims.y + spacing;
+            get_hitbox.x += button_dims.x + spacing :
+            get_hitbox.y += button_dims.y + spacing;
     }
-    return rects;
+    return get_hitboxes;
 };
-
-Rectangle Chararacter::rect(float w, float h) const {
+Rectangle Chararacter::get_hitbox(float w, float h) const {
     return Rectangle{pos.x, pos.y, std::move(w), std::move(h)};
 };
-std::array<Rectangle, 2> Pipe::rect(const float w, const float h) const {
+std::array<Rectangle, 2> Pipe::get_hitbox(const float w, const float h) const {
     return {Rectangle{pos.x, 0, w, pos.y}, Rectangle{pos.x, pos.y+h, w, 12_b}};
 };
-Rectangle Platform::rect() const {
+Rectangle Platform::get_hitbox() const {
     return Rectangle{pos.x, pos.y, size.x, size.y};
 };
