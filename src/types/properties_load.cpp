@@ -42,9 +42,13 @@ Profile& Profile::load(const JsonRef jf) {
 }
 Action& Action::load(const JsonRef jf) {
     const nlohmann::json& j = jf;
-
+    type = j.value("action_type", type);
+    index = j.value("action_index", index);
     return *this;
 }
-
-
-
+Trigger& Trigger::load(const JsonRef jf) {
+    const nlohmann::json& j = jf;
+    type = j.value("trigger_type", type);
+    parameter = j.value("trigger_parameter", parameter);
+    return *this;
+}

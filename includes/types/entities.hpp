@@ -140,16 +140,13 @@ struct Spawner {
     Vec2 vel;
     bool fixed = true;
 
-    Action predicate;
-    bool use_index;
+    Trigger predicate;
     World spawn_in;
-
-    bool check_predicate(const Game& context) const;
 
     // (De)Serialization
     Spawner& load(const JsonRef jf);
     template <class Archive>
-    void serialize(Archive& ar) { ar(fixed, pos, vel, predicate, use_index, spawn_in); }
+    void serialize(Archive& ar) { ar(fixed, pos, vel, predicate, spawn_in); }
 };
 
 class Scene {
@@ -161,7 +158,7 @@ public:
     Vec2 _cam_vel; // Where QNAN means follow player
     Vec2 _cam_pos;
     uint8_t _score = 0;
-    std::vector<Action> _actions = {{ActionType::LOAD_WORLD}};
+    std::vector<Trigger> _events;
 
     // (De)Serialization
     Scene& load(const JsonRef jf);
@@ -170,7 +167,3 @@ public:
         ar(_world, _cam_vel, _cam_pos, _score);
     }
 };
-
-
-
-

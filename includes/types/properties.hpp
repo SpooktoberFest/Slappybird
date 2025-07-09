@@ -70,6 +70,13 @@ struct Action {
     void serialize(Archive& ar) { ar(type, index); };
 };
 
+struct Trigger {
+    TriggerType type;
+    uint8_t parameter;
+    uint8_t state;
 
-
-
+    // (De)Serialization
+    Trigger& load(const JsonRef jf);
+    template <class Archive>
+    void serialize(Archive& ar) { ar(type, parameter); };
+};

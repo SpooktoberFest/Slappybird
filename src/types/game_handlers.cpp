@@ -1,6 +1,8 @@
 #include "game.hpp"
 
 #include <cmath>
+#include <functional>
+#include <chrono>
 
 #include "utils.hpp"
 #include "debug.hpp"
@@ -8,6 +10,10 @@
 #include "raylib.h"
 
 const static auto src = "GameHandlers";
+
+using std::chrono::steady_clock;
+using std::chrono::milliseconds;
+using std::chrono::duration_cast;
 
 
 void Game::handle_entitysim() {
@@ -27,7 +33,7 @@ void Game::handle_entitysim() {
 
     if (check_flag(_gamestate, GameState::GAMEOVER)) return;
 
-    
+
     // Update Camera
     {
         const Vec2& cam_vel = _scene._cam_vel;
@@ -43,8 +49,8 @@ void Game::handle_entitysim() {
 }
 
 void Game::handle_spawning() {
-    for (const auto& spawner : _scene._world.spawners) {
-        if (spawner.check_predicate(*this)) {
+
+    const std::function<void(Spawner)> spawn_in = [&](Spawner spawner){
             World spawn_in = spawner.spawn_in;
             // Optionals
             if (spawn_in.player) {
@@ -75,6 +81,24 @@ void Game::handle_spawning() {
                 spawn.pos.emplace(spawner.pos);
                 _scene._world.biomes.push_back(std::move(spawn));
             }
+        };
+
+    const auto now_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::steady_clock::now().time_since_epoch());
+
+    for (Spawner& spawner : _scene._world.spawners) {
+        switch (spawner.predicate.type) {
+        case TriggerType::TIMER_P_SECS_CONTINOUS:
+            {
+                const auto period = milliseconds(spawner.predicate.parameter);
+                auto interval_count = now_ms / period;
+                if (interval_count >= spawner.predicate.state) {
+                    spawner.predicate.state = interval_count;
+                    spawn_in(spawner);
+                }
+            } break;
+
+        default: break;
         }
     }
 }
@@ -107,8 +131,8 @@ void Game::handle_input() {
         bool(_scene._world.menu && !_scene._world.menu->buttons.empty())) {
 
         // LOG_DEBUG(
-        //     "\n\n\n  Game paused: " + std::to_string(check_flag(_gamestate, GameState::PAUSED) + 
-        //     ", Pause menus exist: " + std::to_string(!_menus.empty()) + 
+        //     "\n\n\n  Game paused: " + std::to_string(check_flag(_gamestate, GameState::PAUSED) +
+        //     ", Pause menus exist: " + std::to_string(!_menus.empty()) +
         //     ", World menus exist: " + std::to_string(_scene._world.menu == std::nullopt));
 
         Menu& smenu = check_flag(_gamestate, GameState::PAUSED) ? _menus.top() : *_scene._world.menu;
@@ -165,7 +189,7 @@ void Game::handle_input() {
         }
 
         // Select key
-        if (IsKeyPressed(_controls.select)) {            
+        if (IsKeyPressed(_controls.select)) {
             LOG_DEBUG("smenu.index: " + std::to_string(smenu.index));
             const ButtonList& sblist = smenu.buttons[smenu.index];
             LOG_DEBUG("sblist.index: " + std::to_string(sblist.index));
@@ -295,9 +319,6 @@ void Game::handle_action(const Action& action) {
         break;
     }
 
-    _scene._actions.push_back(action);
+    // TODO
+    // _scene._actions.push_back(action);
 }
-
-
-
-

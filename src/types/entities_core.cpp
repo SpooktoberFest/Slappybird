@@ -60,19 +60,6 @@ void ButtonList::clamp_index() {
 }
 
 
-bool Spawner::check_predicate(const Game& context) const {
-    const std::vector<Action>& actions = context.get_scene()._actions;
-    return (
-        actions.end() !=
-        std::find_if(actions.begin(), actions.end(),
-            [&](const Action& elem) {
-                if (elem.type != predicate.type) return false;
-                if (!use_index) return true;
-                return (elem.index != predicate.index);
-            }
-        )
-    );
-}
 
 void ButtonList::load_buttons(const std::vector<std::string>& str_vec, ActionType type) {
     buttons.clear();

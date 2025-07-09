@@ -52,7 +52,7 @@ void Game::simulate() {
     if (check_flag(_gamestate, GameState::GAMEOVER)) return;
     handle_spawning();
     handle_collision();
-    _scene._actions.clear();
+    _scene._events.clear();
 };
 
 void Game::render() {

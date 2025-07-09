@@ -18,14 +18,6 @@ public:
     Game();
     virtual ~Game();
 
-    // Getters for Spawners
-    const Scene& get_scene() const { return _scene; };
-    // const GameState get_gamestate() const { return _gamestate; };
-    // const Vector2 get_res() const { return _res; };
-    // const Serializer& get_serializer() const { return _serializer; };
-    // const Menu& get_menu() const { return _menus.top(); };
-    // const ControlScheme& get_controls() const { return _controls; };
-
     // For main
     void simulate();
     void render();
@@ -33,7 +25,7 @@ public:
 
 private:
 
-    // 
+    //
     void reset_scene(const Scene* scene=nullptr);
     void set_background(OptColor color1, OptColor color2);
     void update_resolution(const bool override=false);
@@ -59,6 +51,3 @@ private:
     Shader_ _gradient_shader;
     ControlScheme _controls;
 };
-
-
-

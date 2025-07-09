@@ -47,9 +47,8 @@ Biome& Biome::load(const JsonRef jf) {
 
 Button& Button::load(const JsonRef jf) {
     const nlohmann::json& j = jf;
-    action.type = j.value("action_type", ActionType::NOP);
-    action.index = j.value("action_index", 0);
     text = j.value("text", "");
+    action.load(j);
     return *this;
 }
 ButtonList& ButtonList::load(const JsonRef jf) {
@@ -87,10 +86,8 @@ Spawner& Spawner::load(const JsonRef jf) {
     pos.load(j, "pos");
     vel.load(j, "vel");
     fixed = j.value("fixed", true);
-    predicate.type = j.value("action_type", ActionType::NOP);
-    predicate.index = j.value("action_index", 0);
-    use_index = j.value("use_index", false);
     if (j.count("spawn_in")) spawn_in.load(j["spawn_in"]);
+    predicate.load(j);
     return *this;
 }
 Scene& Scene::load(const JsonRef jf) {

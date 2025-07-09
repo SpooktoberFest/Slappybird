@@ -17,6 +17,22 @@ enum GameState : uint8_t {
 
 // Scoped enums
 
+enum class Behavior : uint8_t {
+    LINEAR_MOVE,
+    ACCELERATE,
+    STRAFE,
+    HOMING,
+    JUMPING_BOTTOM,
+    JUMPING_HERE,
+    AI
+};
+
+enum class TriggerType : uint8_t {
+    NEVER,
+    TOGGLED_GROUP_P,
+    TIMER_P_SECS_ONCE,
+    TIMER_P_SECS_CONTINOUS,
+};
 
 enum class ActionType : uint8_t {
     // Actions that can be called from any world
@@ -26,7 +42,7 @@ enum class ActionType : uint8_t {
     LOAD_WORLD,
     SHOW_WORLDS,
     LOAD_MENU,
-    
+
 
     // Actions that cannot be called from custom worlds
     SPECIAL_ACTION = UCHAR_MAX/2,
@@ -81,7 +97,3 @@ enum class Type : uint8_t {
 
     GAME
 };
-
-
-
-
