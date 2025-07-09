@@ -49,40 +49,6 @@ void Game::handle_entitysim() {
 }
 
 void Game::handle_spawning() {
-
-    const std::function<void(Spawner)> spawn_in = [&](Spawner spawner){
-            World spawn_in = spawner.spawn_in;
-            // Optionals
-            if (spawn_in.player) {
-                spawn_in.player->pos.emplace(spawner.pos);
-                _scene._world.player = *spawn_in.player;
-            }
-            if (spawn_in.menu) {
-                _scene._world.menu = *spawn_in.menu;
-            }
-            // Vectors
-            for (auto& spawn : spawn_in.enemies) {
-                spawn.pos.emplace(spawner.pos);
-                _scene._world.enemies.push_back(std::move(spawn));
-            }
-            for (auto& spawn : spawn_in.spawners) {
-                spawn.pos.emplace(spawner.pos);
-                _scene._world.spawners.push_back(std::move(spawn));
-            }
-            for (auto& spawn : spawn_in.pipes) {
-                spawn.pos.emplace(spawner.pos);
-                _scene._world.pipes.push_back(std::move(spawn));
-            }
-            for (auto& spawn : spawn_in.platforms) {
-                spawn.pos.emplace(spawner.pos);
-                _scene._world.platforms.push_back(std::move(spawn));
-            }
-            for (auto& spawn : spawn_in.biomes) {
-                spawn.pos.emplace(spawner.pos);
-                _scene._world.biomes.push_back(std::move(spawn));
-            }
-        };
-
     const auto now_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::steady_clock::now().time_since_epoch());
 
@@ -94,7 +60,7 @@ void Game::handle_spawning() {
                 auto interval_count = now_ms / period;
                 if (interval_count >= spawner.predicate.state) {
                     spawner.predicate.state = interval_count;
-                    spawn_in(spawner);
+                    _scene._world.emplace(spawner.spawn_in, spawner.pos);
                 }
             } break;
 

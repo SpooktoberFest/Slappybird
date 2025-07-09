@@ -6,7 +6,7 @@
 class Serializer {
 public:
     Serializer() {};
-    virtual ~Serializer() {};
+    ~Serializer() {};
 
     bool saveScene(std::string name, Scene* scene_opt=nullptr);
     bool loadScene(std::string name, Scene* scene_opt=nullptr);

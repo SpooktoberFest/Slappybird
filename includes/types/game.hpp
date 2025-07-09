@@ -16,7 +16,7 @@ class Game {
 
 public:
     Game();
-    virtual ~Game();
+    ~Game();
 
     // For main
     void simulate();

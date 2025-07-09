@@ -58,14 +58,45 @@ void ButtonList::clamp_index() {
         uint8_t(buttons.size() + index)
     );
 }
-
-
-
 void ButtonList::load_buttons(const std::vector<std::string>& str_vec, ActionType type) {
     buttons.clear();
     for (std::size_t i=0 ; i < str_vec.size() ; ++i)
         buttons.push_back(Button{str_vec[i], Action{type, uint8_t(i)}});
 }
+
+void World::emplace(World& world, const Vec2& pos) {
+    // Vectors
+    for (auto& spawn : world.enemies) {
+        spawn.pos.emplace(pos);
+        enemies.push_back(std::move(spawn));
+    }
+    for (auto& spawn : world.spawners) {
+        spawn.pos.emplace(pos);
+        spawners.push_back(std::move(spawn));
+    }
+    for (auto& spawn : world.pipes) {
+        spawn.pos.emplace(pos);
+        pipes.push_back(std::move(spawn));
+    }
+    for (auto& spawn : world.platforms) {
+        spawn.pos.emplace(pos);
+        platforms.push_back(std::move(spawn));
+    }
+    for (auto& spawn : world.biomes) {
+        spawn.pos.emplace(pos);
+        biomes.push_back(std::move(spawn));
+    }
+
+    // Optionals
+    if (world.menu) {
+        menu = *world.menu;
+    }
+    if (world.player) {
+        world.player->pos.emplace(pos);
+        player = *world.player;
+    }
+}
+
 
 
 // Rect functions

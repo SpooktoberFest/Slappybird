@@ -15,43 +15,56 @@
 
 
 struct Chararacter {
+    Chararacter(const JsonRef jr);
+    Chararacter() = default;
+    ~Chararacter() = default;
+
     Vec2 pos;
     Vec2 vel;
 
     Rectangle get_hitbox(float w=1, float h=1) const;
 
     // (De)Serialization
-    Chararacter& load(const JsonRef jf);
     template <class Archive>
     void serialize(Archive& ar) { ar(vel, pos); }
 };
 
 
 struct Pipe {
+    Pipe(const JsonRef jr);
+    Pipe() = default;
+    ~Pipe() = default;
+
     Vec2 pos;
     bool passed;
 
     std::array<Rectangle, 2> get_hitbox(const float w, const float h) const;
 
     // (De)Serialization
-    Pipe& load(const JsonRef jf);
     template <class Archive>
     void serialize(Archive& ar) { ar(pos);};
 };
 
 struct Platform {
+    Platform(const JsonRef jr);
+    Platform() = default;
+    ~Platform() = default;
+
     Vec2 pos;
     Vec2 size {1, 1};
 
     Rectangle get_hitbox() const;
 
     // (De)Serialization
-    Platform& load(const JsonRef jf);
     template <class Archive>
     void serialize(Archive& ar) { ar(pos, size); }
 };
 
 struct Biome {
+    Biome(const JsonRef jr);
+    Biome() = default;
+    ~Biome() = default;
+
     Vec2 pos;
 
     float pipe_width = 2;
@@ -63,7 +76,6 @@ struct Biome {
     float jump_strength = -8.0f;
 
     // (De)Serialization
-    Biome& load(const JsonRef jf);
     template <class Archive>
     void serialize(Archive& ar) {
         ar( pos, pipe_width, gap_height, pipe_speed,
@@ -73,29 +85,36 @@ struct Biome {
 
 
 struct Button {
+    Button(const JsonRef jr);
+    Button(const std::string text, Action action) : text(text), action(action) {};
+    Button() = default;
+    ~Button() = default;
+
     std::string text;
     Action action;
 
     // (De)Serialization
-    Button& load(const JsonRef jf);
     template <class Archive>
     void serialize(Archive& ar) { ar(text, action); }
 };
 
 struct ButtonList {
+    ButtonList(const JsonRef jr);
+    ButtonList() = default;
+    ~ButtonList() = default;
+
     std::vector<Button> buttons;
-    uint8_t index = 0;
-    bool horizontal = false;
     float pos, spacing, begin, end;
     Vec2 button_dims = {1, 1};
+    uint8_t index = 0;
     Type special_content = Type::NONE;
+    bool horizontal = false;
 
     void clamp_index();
     void load_buttons(const std::vector<std::string>& str_vec, const ActionType type);
     std::vector<Rectangle> get_hitboxes(const Vector2& res) const;
 
     // (De)Serialization
-    ButtonList& load(const JsonRef jf);
     template <class Archive>
     void serialize(Archive& ar) {
         ar(buttons, horizontal, pos, spacing, begin, end, button_dims, special_content);
@@ -103,6 +122,10 @@ struct ButtonList {
 };
 
 struct Menu {
+    Menu(const JsonRef jr);
+    Menu() = default;
+    ~Menu() = default;
+
     std::vector<ButtonList> buttons;
     uint8_t index;
     bool fixed = true;
@@ -110,7 +133,6 @@ struct Menu {
     void clamp_index();
 
     // (De)Serialization
-    Menu& load(const JsonRef jf);
     template <class Archive>
     void serialize(Archive& ar) {
         ar(buttons, fixed);
@@ -118,16 +140,22 @@ struct Menu {
 };
 
 struct World {
-    std::optional<Chararacter> player;
-    std::optional<Menu> menu;
+    World(const JsonRef jr);
+    World() = default;
+    ~World() = default;
+
+    void emplace(World& world, const Vec2& pos);
+
     std::vector<Chararacter> enemies;
     std::vector<Spawner> spawners;
     std::vector<Pipe> pipes;
     std::vector<Platform> platforms;
     std::vector<Biome> biomes;
 
+    std::optional<Menu> menu;
+    std::optional<Chararacter> player;
+
     // (De)Serialization
-    World& load(const JsonRef jf);
     template <class Archive>
     void serialize(Archive& ar) {
         ar(player, menu, enemies, spawners, pipes, platforms, biomes);
@@ -136,6 +164,10 @@ struct World {
 
 
 struct Spawner {
+    Spawner(const JsonRef jr);
+    Spawner() = default;
+    ~Spawner() = default;
+
     Vec2 pos;
     Vec2 vel;
     bool fixed = true;
@@ -144,7 +176,6 @@ struct Spawner {
     World spawn_in;
 
     // (De)Serialization
-    Spawner& load(const JsonRef jf);
     template <class Archive>
     void serialize(Archive& ar) { ar(fixed, pos, vel, predicate, spawn_in); }
 };
@@ -152,16 +183,16 @@ struct Spawner {
 class Scene {
 public:
     Scene();
-    virtual ~Scene() {};
+    ~Scene() {};
 
-    World _world;
+    std::vector<Trigger> _events;
     Vec2 _cam_vel; // Where QNAN means follow player
     Vec2 _cam_pos;
+    World _world;
     uint8_t _score = 0;
-    std::vector<Trigger> _events;
 
     // (De)Serialization
-    Scene& load(const JsonRef jf);
+    Scene& load(const JsonRef jr);
     template <class Archive>
     void serialize(Archive& ar) {
         ar(_world, _cam_vel, _cam_pos, _score);

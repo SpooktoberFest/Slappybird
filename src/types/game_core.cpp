@@ -171,7 +171,7 @@ void Game::set_background(OptColor color1, OptColor color2) {
 void Game::reset_scene(const Scene* scene) {
     if (scene) _serializer.loaded_scene = *scene;
     _scene = _serializer.loaded_scene;
-    handle_action({ActionType::SHOW_PROFILES});
+    handle_action(Action{ActionType::SHOW_PROFILES, 0});
 }
 
 bool Game::is_quit() const {

@@ -4,16 +4,15 @@
 #include "json_fwd.hpp"
 
 
-Vec2& Vec2::load(const JsonRef jf, const std::string field, float def) {
-    const nlohmann::json& j = jf;
-    if (!j.count(field)) { x = def; y = def; return *this; }
+Vec2::Vec2(const JsonRef jr, const std::string field, float def) {
+    const nlohmann::json& j = jr;
+    if (!j.count(field)) { x = def; y = def; return; }
     const auto& arr = j[field];
     x = arr[0].is_null() ? def : arr[0].get<float>();
     y = arr[1].is_null() ? def : arr[1].get<float>();
-    return *this;
 }
-Loadout& Loadout::load(const JsonRef jf) {
-    const nlohmann::json& j = jf;
+Loadout::Loadout(const JsonRef jr) {
+    const nlohmann::json& j = jr;
     head = j.value("head", head);
     torso = j.value("torso", torso);
     hands = j.value("hands", hands);
@@ -22,33 +21,28 @@ Loadout& Loadout::load(const JsonRef jf) {
     const std::vector<float> tmp = j.value("moveset", std::vector<float>());
     for (std::size_t i{0} ; i < std::min(tmp.size(), std::size_t(4)) ; ++i)
         moveset[i] = static_cast<Technique>(tmp[i]);
-    return *this;
 }
-ControlScheme& ControlScheme::load(const JsonRef jf) {
-    const nlohmann::json& j = jf;
+ControlScheme::ControlScheme(const JsonRef jr) {
+    const nlohmann::json& j = jr;
     move = j.value("move", move);
     nav = j.value("nav", nav);
     jump = j.value("jump", jump);
     select = j.value("select", select);
     pause = j.value("pause", pause);
     reset = j.value("reset", reset);
-    return *this;
 }
-Profile& Profile::load(const JsonRef jf) {
-    const nlohmann::json& j = jf;
+Profile::Profile(const JsonRef jr) {
+    const nlohmann::json& j = jr;
     equipment = unlock_map<Equipment>(j.value("equipment", std::vector<uint8_t>()));
     moves = unlock_map<Technique>(j.value("moves", std::vector<uint8_t>()));
-    return *this;
 }
-Action& Action::load(const JsonRef jf) {
-    const nlohmann::json& j = jf;
+Action::Action(const JsonRef jr) {
+    const nlohmann::json& j = jr;
     type = j.value("action_type", type);
     index = j.value("action_index", index);
-    return *this;
 }
-Trigger& Trigger::load(const JsonRef jf) {
-    const nlohmann::json& j = jf;
+Trigger::Trigger(const JsonRef jr) {
+    const nlohmann::json& j = jr;
     type = j.value("trigger_type", type);
     parameter = j.value("trigger_parameter", parameter);
-    return *this;
 }

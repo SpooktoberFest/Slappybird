@@ -119,7 +119,7 @@ bool Serializer::devModeLoad(std::string path) {
         for (const auto& j : data["scenes"]) {
             ++total;
             try {
-                Scene scene = Scene().load(j["data"]);
+                Scene scene = Scene(j["data"]);
                 saveScene(j["name"], &scene);
             } catch (const std::exception& e) {
                 LOG_ERROR("Failed to parse scene: " + std::string(e.what()));
@@ -133,7 +133,7 @@ bool Serializer::devModeLoad(std::string path) {
         for (const auto& j : data["menus"]) {
             ++total;
             try {
-                Menu menu = Menu().load(j["data"]);
+                Menu menu = Menu(j["data"]);
                 saveMenu(j["name"], &menu);
             } catch (const std::exception& e) {
                 LOG_ERROR("Failed to parse menu: " + std::string(e.what()));
@@ -147,7 +147,7 @@ bool Serializer::devModeLoad(std::string path) {
         for (const auto& j : data["profiles"]) {
             ++total;
             try {
-                Profile profile = Profile().load(j["data"]);
+                Profile profile = Profile(j["data"]);
                 saveProfile(j["name"], &profile);
             } catch (const std::exception& e) {
                 LOG_ERROR("Failed to parse profile: " + std::string(e.what()));
