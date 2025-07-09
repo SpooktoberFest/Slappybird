@@ -105,7 +105,7 @@ void Game::render() {
         std::size_t i, j;
         for (i=0 ; i < menu.buttons.size() ; ++i) {
             const ButtonList& button_list = menu.buttons[i];
-            if (button_list.buttons.empty()) continue; 
+            if (button_list.buttons.empty()) continue;
             auto hitboxes = button_list.get_hitboxes(_res);
             for (j=0 ; j < hitboxes.size() ; ++j) {
                 Rectangle& hitbox = hitboxes[j];
@@ -177,5 +177,3 @@ void Game::reset_scene(const Scene* scene) {
 bool Game::is_quit() const {
     return check_flag(_gamestate, GameState::QUIT);
 }
-
-

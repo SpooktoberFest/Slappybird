@@ -22,11 +22,8 @@ int main(int argc, char** argv) {
         } else if (argc == 2) {
             Serializer serializer;
             serializer.devModeLoad(argv[1]);
-            
+
         }
-
-
-
     }
     return 0;
 }

@@ -30,5 +30,3 @@ private:
 
 // Raylib enum
 enum KeyboardKey_ {};
-
-

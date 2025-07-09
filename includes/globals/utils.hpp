@@ -37,5 +37,3 @@ Rectangle& operator*=(Rectangle& lhs, const float rhs);
 constexpr bool check_flag(const GameState& lhs, const GameState& rhs)   { return bool(uint8_t(lhs) & uint8_t(rhs)); }
 constexpr GameState& flip_flag(GameState& lhs, const GameState& rhs)    { return (lhs = GameState(uint8_t(lhs) ^ uint8_t(rhs))); }
 constexpr GameState& set_flag(GameState& lhs, const GameState& rhs)     { return (lhs = GameState(uint8_t(lhs) | uint8_t(rhs))); }
-
-

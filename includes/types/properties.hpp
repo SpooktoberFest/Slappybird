@@ -50,6 +50,7 @@ struct ControlScheme {
     void serialize(Archive& ar) { ar(move, nav, jump, select, pause, reset); };
 };
 
+
 struct Profile {
     unlock_map<Equipment> equipment;
     unlock_map<Technique> moves;

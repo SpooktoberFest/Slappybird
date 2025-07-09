@@ -19,5 +19,3 @@ Rectangle& operator*=(Rectangle& lhs, const float rhs) {
     lhs.width *= rhs;   lhs.height *= rhs;
     return lhs;
 }
-
-

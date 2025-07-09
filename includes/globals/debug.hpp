@@ -45,4 +45,3 @@
 #else
 #define LOG_FATAL(output)
 #endif
-

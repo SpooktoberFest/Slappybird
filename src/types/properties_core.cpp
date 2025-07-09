@@ -22,4 +22,3 @@ ControlScheme::ControlScheme() :
     select(K(KEY_ENTER)),
     pause(K(KEY_ESCAPE)),
     reset(K(KEY_BACKSPACE)) {};
-

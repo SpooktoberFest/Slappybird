@@ -182,5 +182,3 @@ std::vector<std::string> Serializer::get_files(const std::string& path, const st
 
     return matched_files;
 }
-
-
